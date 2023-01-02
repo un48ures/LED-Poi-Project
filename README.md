@@ -1,1 +1,1 @@
-first README entry
+#LED Poi Project
