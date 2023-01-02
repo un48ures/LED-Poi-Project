@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "Arduino_Uno_Transmitter"
+		},
+		{
+			"path": "Teensy_3.6"
+		},
+		{
+			"path": "Teensy_4.0"
+		}
+	],
+	"settings": {}
+}
