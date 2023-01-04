@@ -1,3 +1,5 @@
+//Transmitter Signal Strength Test
+
 /*
   Teensy 4.0 - Poi Project
          - Transmitter Code
@@ -25,7 +27,7 @@ const byte CH_P6 = 25;
 
 
 //Data arrays for each poi(receiver)
-//NoteOn+Kanal, Note, Pich-Bend cmd, Pitch-Bend val1,val2
+//NoteOn+Kanal, Note, Pitch-Bend cmd, Pitch-Bend val1,val2
 int data0 = 0;
 byte array_manual_ctrl[5] = {0, 0, 0, 0, 0}; //data array for manuel control via button and poti
 byte array1[5] = {144, 0, 0, 0, 0};
