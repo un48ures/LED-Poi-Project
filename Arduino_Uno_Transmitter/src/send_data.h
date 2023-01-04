@@ -32,12 +32,12 @@ void send_data(uint8_t ch, byte *content, uint8_t size, const uint8_t *pipe_addr
     Serial.print(pipe_address[4]);
     Serial.print(pipe_address[5]);
     Serial.print("\t send status: ");
-    Serial.print(status);
-    Serial.print("\t size_1: ");
-    Serial.print(size_1);
-    Serial.print("\t size parameter: ");
-    Serial.print(size);
-    Serial.print("\taddress content: ");
-    Serial.println((unsigned int)content, HEX);
+    Serial.println(status);
+    // Serial.print("\t size_1: ");
+    // Serial.print(size_1);
+    // Serial.print("\t size parameter: ");
+    // Serial.print(size);
+    // Serial.print("\taddress content: ");
+    // Serial.println((unsigned int)content, HEX);
 #endif
 }

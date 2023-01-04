@@ -6,16 +6,19 @@
   16.03.2022
 */
 
+//#define PRINT_SIGNAL_STRENGTH
+#define DEBUG_SEND
+#define VIDEO_LIGHT
+//#define MIDI_MODE
+
+
 #include <variables.h>
 #include <get_signal_strength.h>
 #include <send_data.h>
 #include <videolight.h>
 #include <midi_mode.h>
 
-//#define PRINT_SIGNAL_STRENGTH
-//#define DEBUG_SEND
-//#define VIDEO_LIGHT
-#define MIDI_MODE
+
 
 RF24 radio(7, 8); // CE, CSN
 
