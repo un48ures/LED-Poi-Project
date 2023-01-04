@@ -1,10 +1,10 @@
 
 #include <RF24.h>
 
-/// @brief Sending every receiver 100 packets and checking how much got received successfully.
-///         Starting at the CH[0] address for 6 Channels
-/// @param radio
-/// @param CHs
+/// @brief Sending every poi 100 packets and checking how much got received successfully.
+///        Starting at the first element of CHs array for all ch_total count
+/// @param radio Radio object used to send/receive data
+/// @param CHs Array of all channel numbers
 void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
 {
     for (int j = 0; j < ch_total; j++)

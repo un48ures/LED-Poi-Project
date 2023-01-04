@@ -10,7 +10,8 @@ const byte CHs[6] = {20, 30, 40, 50, 60, 70}; // Channels of pois 1-6
 
 // NoteOn+Kanal, Note, Pitch-Bend cmd, Pitch-Bend val1,val2
 int data0 = 0;
-byte array_manual_ctrl[5] = {0, 0, 0, 0, 0}; // data array for manuel control via button and poti
+byte data_array[5] = {1, 2, 3, 4, 5}; // data array for manuel control via button and poti
+byte array0[6][5] = {};
 byte array1[5] = {144, 0, 0, 0, 0};
 byte array2[5] = {145, 0, 0, 0, 0};
 byte array3[5] = {146, 0, 0, 0, 0};
@@ -22,18 +23,19 @@ int brightness = 0;
 int brightness_old = 0;
 
 // HW Pins
-int LED_green = 9; // Pin 9
-int LED_red = 6;   // Pin 6
-int taster = 3;    // Pin 3
+enum HW_PINS
+{
+    LED_GREEN = 9,
+    LED_RED = 6,
+    TASTER = 3
+};
 
 // State variables
-int tasterstatus = 0; // init state taster
-int tasterstatus_old = 0;
-int taster_change = 0;
-byte taster_z = 0;     // Mode/Status Zählervariable
-byte taster_z_old = 0; // alter Wert
+boolean button_state = 0; // init state taster
+boolean button_state_old = 0;
+boolean taster_change = 0;
+byte program = 0;     // Mode/Status Zählervariable
+byte program_old = 0; // alter Wert
 
 // Poti
-int eingang = A0;       // Poti Anschluss A0
-int sensorwert = 0;     // init poti value
-int sensorwert_old = 0; // alter Wert
+int poti = A0;       // Poti Anschluss A0

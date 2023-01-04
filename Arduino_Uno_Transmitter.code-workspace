@@ -10,5 +10,9 @@
 			"path": "Teensy_4.0"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"*.tcc": "cpp"
+		}
+	}
 }
