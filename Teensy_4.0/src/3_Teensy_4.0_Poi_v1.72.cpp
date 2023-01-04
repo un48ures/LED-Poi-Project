@@ -497,7 +497,7 @@ void loop() {
 
     default:
       LED_blink_red();
-      Serial.println("default case");
+      //Serial.println("default case");
       break;
   }
 

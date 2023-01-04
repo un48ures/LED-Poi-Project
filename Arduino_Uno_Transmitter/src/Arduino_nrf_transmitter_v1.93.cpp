@@ -6,71 +6,33 @@
   16.03.2022
 */
 
-#include <Arduino.h>
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
+
+#include <variables.h>
+#include <get_signal_strength.h>
 
 RF24 radio(7, 8); // CE, CSN
 
-const byte pipe_address[6] = "00001";//Pipe address
-
-//Channel Poi 1-6 -> Channel 20-25
-const byte CH_P1 = 20;
-const byte CH_P2 = 21;
-const byte CH_P3 = 22;
-const byte CH_P4 = 23;
-const byte CH_P5 = 24;
-const byte CH_P6 = 25;
-
-const byte CHs [6] = {20, 30, 40, 50, 60, 70};
 
 
-//Data arrays for each poi(receiver)
-//NoteOn+Kanal, Note, Pitch-Bend cmd, Pitch-Bend val1,val2
-int data0 = 0;
-byte array_manual_ctrl[5] = {0, 0, 0, 0, 0}; //data array for manuel control via button and poti
-byte array1[5] = {144, 0, 0, 0, 0};
-byte array2[5] = {145, 0, 0, 0, 0};
-byte array3[5] = {146, 0, 0, 0, 0};
-byte array4[5] = {147, 0, 0, 0, 0};
-byte array5[5] = {148, 0, 0, 0, 0};
-byte array6[5] = {149, 0, 0, 0, 0};
-
-int brightness = 0;
-int brightness_old = 0;
-
-//HW Pins
-int LED_green = 9; //Pin 9
-int LED_red = 6; //Pin 6
-int taster = 3;// Pin 3
-
-//state variables
-int tasterstatus = 0; //init state taster
-int tasterstatus_old = 0;
-int taster_change = 0;
-byte taster_z = 0; //Mode/Status Zählervariable
-byte taster_z_old = 0; //alter Wert
-
-//Poti
-int eingang = A0; //Poti Anschluss A0
-int sensorwert = 0; //init poti value
-int sensorwert_old = 0; //alter Wert
-
-
-void setup() {
-  pinMode(LED_green, OUTPUT);
+void setup()
+{
+  //Configuration I/O
+  pinMode(LED_green, OUTPUT); 
   pinMode(LED_red, OUTPUT);
+  pinMode(taster, INPUT); // Pin 3 button Input
 
-  pinMode(taster, INPUT); //Pin 3 button Input
-
+  //Serial configuration
   Serial.begin(115200);
   
+  //Radio configuration
   radio.begin();
-  radio.setPALevel(RF24_PA_LOW);
+  radio.setPALevel(RF24_PA_MIN);
   radio.setDataRate(RF24_1MBPS);
-  radio.setRetries(0,0);
+  radio.setRetries(0, 0);
   radio.stopListening();
+  radio.openWritingPipe(pipe_address);
+  
+  //Set LEDs
   digitalWrite(LED_green, HIGH);
   digitalWrite(LED_red, HIGH);
   delay(500);
@@ -79,34 +41,10 @@ void setup() {
   digitalWrite(LED_green, HIGH);
 }
 
-void loop(){
-  char buffer[32];
-  radio.openWritingPipe(pipe_address);
-  
-  for(int j=0; j<6;j++){
-    int counter = 0;
-    radio.setChannel(CHs[j]);
-
-    for(int i=0; i<100; i++)
-    {
-      int status = radio.write(buffer,32); // send 32 bytes of data. It does not matter what it is
-      if(status)
-          counter++;
-
-      delay(1); // try again in 1 millisecond
-    }
-
-    Serial.print("Channel: ");
-    Serial.print(CHs[j]);
-    Serial.print(" ");
-    Serial.print("Signal strength: ");
-    Serial.println(counter);
-  }
-  Serial.println(" ");
-  _delay_ms(500);
+void loop()
+{
+  print_signal_strength(&radio, CHs, int(sizeof(CHs)));
 }
-
-
 
 // //Channel, Bildnr, roteLED an
 // void send_data (int ch, byte content) {
@@ -118,7 +56,6 @@ void loop(){
 //   radio.write(&array_manual_ctrl, sizeof(array_manual_ctrl));
 //   digitalWrite(LED_red, LOW);
 // }
-
 
 // //Main Loop---------------------------------------------------------------------------------
 // void loop() {
@@ -142,7 +79,7 @@ void loop(){
 //   if (brightness_old != brightness || taster_z_old != taster_z || taster_z > 11) {
 //     brightness_old = brightness;
 //     taster_z_old = taster_z;
-    
+
 //     if (taster_z > 13) {
 //       taster_z = 0;
 //     }
