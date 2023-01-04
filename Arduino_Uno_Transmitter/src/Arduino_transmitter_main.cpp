@@ -8,8 +8,8 @@
 
 //#define PRINT_SIGNAL_STRENGTH
 #define DEBUG_SEND
-#define VIDEO_LIGHT
-//#define MIDI_MODE
+//#define VIDEO_LIGHT
+#define MIDI_MODE
 
 
 #include <variables.h>

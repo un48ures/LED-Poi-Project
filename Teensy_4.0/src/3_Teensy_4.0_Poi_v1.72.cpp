@@ -25,7 +25,7 @@
 #define RF24_MOSI 11
 #define RF24_MISO 12
 #define RF24_SCK 13
-#define CHANNEL 50 //CHANNEL: 20 30 40 50 60 70 -> POI (1 2 3 4 5 6) 
+#define CHANNEL 20 //CHANNEL: 20 30 40 50 60 70 -> POI (1 2 3 4 5 6) 
 //Poi 1 - 4 -> Teensy 4.0 -> Channel 20 - 50
 //Poi 5 & 6 -> Teensy 3.6 -> Channel 60 & 70
 RF24 radio(4, 5); // CE, CSN
