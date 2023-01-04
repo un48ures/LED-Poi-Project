@@ -19,8 +19,7 @@ void midi_mode(RF24 *radio)
         {
             array0[data0 - NOTE_ON][0] = data0;
             array0[data0 - NOTE_ON][1] = Serial.read();
-            // radio->setChannel(CHs[data0 - NOTE_ON]);
-            // radio->write(array0[data0 - NOTE_ON], sizeof(array0[data0 - NOTE_ON]));
+            
             send_data(CHs[data0 - NOTE_ON], array0[data0 - NOTE_ON], sizeof(array0[data0 - NOTE_ON]), pipe_address, radio);
             //radio->write(test[0], sizeof(test));
             digitalWrite(LED_RED, HIGH);

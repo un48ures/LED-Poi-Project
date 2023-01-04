@@ -6,14 +6,14 @@
   16.03.2022
 */
 
-//#define PRINT_SIGNAL_STRENGTH
+#define PRINT_SIGNAL_STRENGTH
 #define DEBUG_SEND
 //#define VIDEO_LIGHT
-#define MIDI_MODE
+//#define MIDI_MODE
 
 
 #include <variables.h>
-#include <get_signal_strength.h>
+#include <signal_strength_test.h>
 #include <send_data.h>
 #include <videolight.h>
 #include <midi_mode.h>
@@ -36,7 +36,7 @@ void setup()
   radio.begin();
   radio.setPALevel(RF24_PA_MIN);
   radio.setDataRate(RF24_1MBPS);
-  radio.setRetries(5, 3);
+  radio.setRetries(1, 1); //One retry as default
   radio.stopListening();
   radio.openWritingPipe(pipe_address);
 

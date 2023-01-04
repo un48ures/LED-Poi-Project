@@ -7,6 +7,7 @@
 /// @param CHs Array of all channel numbers
 void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
 {
+    radio->setRetries(0, 0); //No retries allowed
     for (int j = 0; j < ch_total; j++)
     {
         char buffer[32];
