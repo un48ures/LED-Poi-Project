@@ -7,12 +7,12 @@
 */
 
 //#define PRINT_SIGNAL_STRENGTH
-//#define DEBUG_SEND
-//#define VIDEO_LIGHT
+#define DEBUG_SEND
+#define VIDEO_LIGHT
 //#define MIDI_MODE
 
 
-#include <variables.h>
+#include <variables_transmitter.h>
 #include <signal_strength_test.h>
 #include <send_data.h>
 #include <videolight.h>
