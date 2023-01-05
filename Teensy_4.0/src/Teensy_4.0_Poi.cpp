@@ -20,8 +20,8 @@
 #include <RF24.h>
 #include "FastLED.h"
 #include "pic_array.cpp"
-#include <hardware.h>
-#include <variables_t4.h>
+#include <teensy_4.0_hardware.h>
+#include <variables_receivers.h>
 #include <visual_functions.h>
 
 void setup()

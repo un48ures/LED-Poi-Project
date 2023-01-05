@@ -14,7 +14,7 @@ uint8_t gHue = 128;
 
 // Message Variables
 int message_global = 99; // default message 99 -> Standby RED LED blinking
-long message_brightness = 0;
+int message_brightness = 0;
 
 // Additional
 int looping = 0;
