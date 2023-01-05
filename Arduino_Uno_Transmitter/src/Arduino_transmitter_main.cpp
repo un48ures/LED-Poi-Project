@@ -6,8 +6,8 @@
   16.03.2022
 */
 
-#define PRINT_SIGNAL_STRENGTH
-#define DEBUG_SEND
+//#define PRINT_SIGNAL_STRENGTH
+//#define DEBUG_SEND
 //#define VIDEO_LIGHT
 //#define MIDI_MODE
 
@@ -60,6 +60,6 @@ void loop()
 #endif
 
 #ifdef MIDI_MODE
-  midi_mode(&radio);
+  midi_mode(&radio, sizeof(CHs));
 #endif
 }
