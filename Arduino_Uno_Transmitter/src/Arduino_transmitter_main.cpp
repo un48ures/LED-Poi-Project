@@ -7,9 +7,9 @@
 */
 
 //#define PRINT_SIGNAL_STRENGTH
-#define DEBUG_SEND
-#define VIDEO_LIGHT
-//#define MIDI_MODE
+#define MODE 0  //0 -> PRINT_SIGNAL_STRENGTH
+                //1 -> VIDEO_LIGHT
+                //2 -> MIDI_MODE
 
 
 #include <variables_transmitter.h>
@@ -36,7 +36,7 @@ void setup()
   radio.begin();
   radio.setPALevel(RF24_PA_MIN);
   radio.setDataRate(RF24_1MBPS);
-  radio.setRetries(1, 1); //One retry as default
+  radio.setRetries(4, 2); //One retry as default
   radio.stopListening();
   radio.openWritingPipe(pipe_address);
 
@@ -51,15 +51,15 @@ void setup()
 
 void loop()
 {
-#ifdef PRINT_SIGNAL_STRENGTH
+#if MODE == 0
   print_signal_strength(&radio, CHs, int(sizeof(CHs)));
 #endif
 
-#ifdef VIDEO_LIGHT
+#if MODE == 1
   video_light_mode(&radio);
 #endif
 
-#ifdef MIDI_MODE
+#if MODE == 2
   midi_mode(&radio, sizeof(CHs));
 #endif
 }

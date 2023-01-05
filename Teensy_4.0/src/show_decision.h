@@ -73,67 +73,67 @@ void show_decision(int message_global)
     LED_strobo();
     break;
   case 12:
-    PoiSonic(50, array1);
+    PoiSonic(timePicIsShown, array1);
     break;
   case 13:
-    PoiSonic(50, array2);
+    PoiSonic(timePicIsShown, array2);
     break;
   case 14:
-    PoiSonic(50, array3);
+    PoiSonic(timePicIsShown, array3);
     break;
   case 15:
-    PoiSonic(50, array4);
+    PoiSonic(timePicIsShown, array4);
     break;
   case 16:
-    PoiSonic(50, array5);
+    PoiSonic(timePicIsShown, array5);
     break;
   case 17:
-    PoiSonic(50, array6);
+    PoiSonic(timePicIsShown, array6);
     break;
   case 18:
-    PoiSonic(50, array7);
+    PoiSonic(timePicIsShown, array7);
     break;
   case 19:
-    PoiSonic(50, array8);
+    PoiSonic(timePicIsShown, array8);
     break;
   case 20:
-    PoiSonic(50, array9);
+    PoiSonic(timePicIsShown, array9);
     break;
   case 21:
-    PoiSonic(50, array10);
+    PoiSonic(timePicIsShown, array10);
     break;
   case 22:
-    PoiSonic(50, array11);
+    PoiSonic(timePicIsShown, array11);
     break;
   case 23:
-    PoiSonic(50, array12);
+    PoiSonic(timePicIsShown, array12);
     break;
   case 24:
-    PoiSonic(50, array13);
+    PoiSonic(timePicIsShown, array13);
     break;
   case 25:
-    PoiSonic(50, array14);
+    PoiSonic(timePicIsShown, array14);
     break;
   case 26:
-    PoiSonic(50, array15);
+    PoiSonic(timePicIsShown, array15);
     break;
   case 27:
-    PoiSonic(50, array16);
+    PoiSonic(timePicIsShown, array16);
     break;
   case 28:
-    PoiSonic(50, array17);
+    PoiSonic(timePicIsShown, array17);
     break;
   case 29:
-    PoiSonic(50, array18);
+    PoiSonic(timePicIsShown, array18);
     break;
   case 30:
-    PoiSonic(50, array19);
+    PoiSonic(timePicIsShown, array19);
     break;
   case 31:
-    PoiSonic(50, array20);
+    PoiSonic(timePicIsShown, array20);
     break;
   case 32:
-    PoiSonic(50, array21);
+    PoiSonic(timePicIsShown, array21);
     break;
 
   default:

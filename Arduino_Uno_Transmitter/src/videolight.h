@@ -18,12 +18,12 @@ void video_light_mode(RF24* radio)
   }
 
   // If change then send
-  if (brightness_old != brightness || program_old != program || program > 11)
+  if (brightness_old != brightness || program_old != program || program > 20)
   {
     brightness_old = brightness;
     program_old = program;
 
-    if (program > 11)
+    if (program > 20)
     {
       program = 0;
     }

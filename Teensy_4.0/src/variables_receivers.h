@@ -4,6 +4,7 @@ const int DEFAULT_BRIGHTNESS = 2; // General fix brightness - max brightness 255
 const long interval_1 = 1000;     // ms 1st LED Standby blink interval
 const long LED_red_on_time = 50;  // ms 1st LED Standby blink on-time
 const int numberOfSlices = 150;
+const int timePicIsShown = 25;
 
 // LED Variables
 CRGB leds[NUM_LEDS];
