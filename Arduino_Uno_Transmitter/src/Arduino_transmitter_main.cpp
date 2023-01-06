@@ -12,11 +12,11 @@ void loop()
   digitalWrite(LED_RED, HIGH);
   if (Serial.available() > 0)
   {
-    char data = Serial.read();
-    char str[2];
+    int data = Serial.read();
+    char str[1];
     str[0] = data;
-    str[1] = '\0';
-    Serial.print(str);
+    //str[1] = '\0';
+    Serial.print(data);
   }
 }
 
