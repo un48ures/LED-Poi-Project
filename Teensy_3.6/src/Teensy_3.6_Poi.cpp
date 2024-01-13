@@ -57,7 +57,7 @@ void loop() {
   }
   
   //main function to show pictures
-  show_decision(message_global);
+  display(message_global);
 
 //Data Receive
   if (radio.available()) {

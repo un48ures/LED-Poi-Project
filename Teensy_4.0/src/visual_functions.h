@@ -2,7 +2,7 @@
 /// @brief Function to go through the picture arrays and show each slice via FastLED
 /// @param time Time a picture is shown (repeated while time is not over)
 /// @param array Array (picture) to be shown via FastLED
-void PoiSonic(unsigned long time, const unsigned int array[])
+void PoiSonic_old(unsigned long time, const unsigned int array[])
 {
     unsigned long currentTime = millis();
 
@@ -21,9 +21,39 @@ void PoiSonic(unsigned long time, const unsigned int array[])
             FastLED.show();
             // Serial.println("FASTLED show...");
             delayMicroseconds(500); // may need to increase / decrease depending on spin rate original value = 40
-                                    // hier
         }
         delayMicroseconds(1000); // Abstand zwischen Bilder - may need to increase / decrease depending on spin rate
+    }
+}
+
+void showPicOnce(const unsigned int array[])
+{
+    for (int x = 0; x < numberOfSlices; x++)
+        {
+            for (int z = NUM_LEDS; z > 0; z--)
+            {
+                leds[z - 1] = array[x + ((NUM_LEDS - z) * numberOfSlices)];
+            }
+            FastLED.setBrightness(message_brightness);
+            FastLED.show();
+            // Serial.println("FASTLED show...");
+            // if (radio.available()) return;
+            delayMicroseconds(500); // Pause between slices - may need to increase / decrease depending on spin rate original value = 40
+        }
+}
+
+void PoiSonic(unsigned long time, const unsigned int array[])
+{
+    unsigned long currentTime = millis();
+
+    while ((millis() < currentTime + (time)) && !radio.available())
+    {
+        showPicOnce(array);
+        delayMicroseconds(1000); // Abstand zwischen Bilder - may need to increase / decrease depending on spin rate
+    }
+    if ((millis() < currentTime + (time)) && radio.available())
+    {
+        Serial.println("Radio available but time not over");
     }
 }
 

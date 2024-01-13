@@ -54,7 +54,7 @@ void loop()
   }
 
   //main function to show pictures
-  show_decision(message_global);
+  display(message_global);
 
   // Data Receive
   if (radio.available())
@@ -63,7 +63,7 @@ void loop()
     radio.read(&array1, sizeof(array1));
     message_global = array1[1];
     message_brightness = array1[3];
-    printf("%i\n%i\n%i\n%i\n%i\n",array1[0], array1[1],array1[2],array1[3],array1[4],array1[5]);
+    printf("%i\n%i\n%i\n%i\n%i\n",array1[0], array1[1],array1[2],array1[3],array1[4]);
     printf("Message Brightness: %i \n", message_brightness);
     printf("Current Millis: %i\n", millis());
   }

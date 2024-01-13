@@ -1,7 +1,7 @@
 
 /// @brief Make decision which array to show in relation to the reveived message_global
 /// @param message_global shows the function which picture/array should be shown
-void show_decision(int message_global)
+void display(int message_global)
 {
   switch (message_global)
   {
@@ -43,19 +43,19 @@ void show_decision(int message_global)
     // FADE PULSE - BLUE
     hue = 150; // BLUE
     LED_Pulsing(hue, message_brightness);
-    delay(50);
+    // delay(50);
     break;
   case 8:
     // FADE PULSE - GREEN
     hue = 100; // GREEN
     LED_Pulsing(hue, message_brightness);
-    delay(50);
+    // delay(50);
     break;
   case 9:
     // FADE PULSE - RED
     hue = 255; // GREEN
     LED_Pulsing(hue, message_brightness);
-    delay(50);
+    // delay(50);
     break;
 
   //    case 9:
