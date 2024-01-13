@@ -52,6 +52,10 @@ void loop()
     fillupDone = 0;
     filldownDone = 0;
   }
+  Serial.println(sizeof(array1));
+  Serial.println(sizeof(array2));
+   Serial.println(sizeof(array3));
+    Serial.println(sizeof(array4));
 
   //main function to show pictures
   show_decision(message_global);
