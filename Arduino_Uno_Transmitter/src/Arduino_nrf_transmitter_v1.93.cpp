@@ -12,7 +12,7 @@
 
 RF24 radio(7, 8); // CE, CSN
 
-
+unsigned long old_time = 0;
 
 void setup()
 {
@@ -43,7 +43,13 @@ void setup()
 
 void loop()
 {
-  print_signal_strength(&radio, CHs, int(sizeof(CHs)));
+  if(millis() > old_time + 1000)
+  {
+    //print_signal_strength(&radio, CHs, int(sizeof(CHs)));
+    test_data_transport(&radio, CHs, int(sizeof(CHs)));
+    old_time = millis();
+  }
+  
 }
 
 // //Channel, Bildnr, roteLED an

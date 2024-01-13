@@ -28,5 +28,42 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
         Serial.println(counter);
     }
     Serial.println(" ");
-    _delay_ms(500);
+}
+
+void test_data_transport(RF24 *radio, const byte *CHs, int8_t ch_total)
+{
+    //for (int j = 0; j < ch_total; j++)
+    for (int j = 0; j < 1; j++)
+    {
+        unsigned int data_length = 1000; // 1000 bytes
+        char buffer[data_length];
+        radio->setChannel(CHs[j]);
+
+        // Serial.print("Data bytes to send: ");
+        // Serial.println(data_length);
+
+        for (int i = 0; i < 3; i++)
+        {
+            Serial.print("Channel:");
+            Serial.print(CHs[j]);
+            Serial.print(" ");
+            unsigned long starttime = micros();
+            unsigned long duration = 0;
+            int status = radio->write(buffer, data_length); // send 32 bytes of data. It does not matter what it is
+            if (status)
+            {
+                duration = micros() - starttime;
+                Serial.print("SUCCESS ");
+                Serial.print(" duration[us]: ");
+                Serial.println(duration);
+            }
+            else
+            {
+                Serial.println("ERROR");
+            }          
+            delay(1); // try again in 1 millisecond
+        }
+        Serial.print("\t");
+    }
+    Serial.println(" ");
 }
