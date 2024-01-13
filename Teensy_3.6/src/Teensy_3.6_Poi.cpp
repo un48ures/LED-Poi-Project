@@ -19,7 +19,7 @@
 
 #include <Arduino.h>
 #include <SPI.h>
-#include <nRF24L01.h>
+// #include <nRF24L01.h>
 #include <RF24.h>
 #include "FastLED.h"
 #include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\pic_array.h"

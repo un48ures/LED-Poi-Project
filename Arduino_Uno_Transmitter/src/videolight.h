@@ -30,7 +30,7 @@ void video_light_mode(RF24* radio)
 
     Serial.print("Program counter: ");
     Serial.println(program);
-
+  
     // data_array[1] = program;
     // data_array[3] = brightness;
 

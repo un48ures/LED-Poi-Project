@@ -11,6 +11,7 @@ void send_data(uint8_t ch, byte *content, uint8_t size, const uint8_t *pipe_addr
     uint8_t size_1 = (uint8_t)sizeof(*content);
     int status = radio->write(content, size);
     digitalWrite(LED_RED, LOW);
+#define DEBUG_SEND
 #ifdef DEBUG_SEND
     Serial.print("Content: ");
     Serial.print(content[0]);
