@@ -32,10 +32,10 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
 
 void test_data_transport(RF24 *radio, const byte *CHs, int8_t ch_total)
 {
-    //for (int j = 0; j < ch_total; j++)
-    for (int j = 0; j < 1; j++)
+    for (int j = 0; j < ch_total; j++)
+    //for (int j = 0; j < 1; j++)
     {
-        unsigned int data_length = 1000; // 1000 bytes
+        unsigned int data_length = 32; // 1000 bytes
         char buffer[data_length];
         radio->setChannel(CHs[j]);
 
@@ -64,6 +64,6 @@ void test_data_transport(RF24 *radio, const byte *CHs, int8_t ch_total)
             delay(1); // try again in 1 millisecond
         }
         Serial.print("\t");
+        Serial.println(" --------------------------------------------------------------- ");
     }
-    Serial.println(" ");
 }
