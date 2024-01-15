@@ -42,19 +42,20 @@ unsigned int old_time = 0;
 
 void setup()
 {
-  Serial.begin(115200);
-  SPI.setSCK(RF24_SCK);
+  Serial.begin(115200);                     //Serial
+  printf("Initializing...");    
+  SPI.setSCK(RF24_SCK);                     //SPI
   SPI.begin();
-  radio.begin();
+  delay(200);                               //LED
+  FastLED.addLeds<APA102,(uint8_t) DATA_PIN,(uint8_t) CLOCK_PIN, (EOrder) COLOR_ORDER, (uint32_t) DATA_RATE_MHZ(10)>(leds, (int) NUM_LEDS);
+  FastLED.clear();
+  FastLED.setBrightness(DEFAULT_BRIGHTNESS);
+  radio.begin();                            //radio
   radio.openReadingPipe(0, pipe_address);
   radio.setPALevel(RF24_PA_HIGH);
   radio.setDataRate(RF24_1MBPS);
   radio.setChannel(CHANNEL);
   radio.startListening();
-
-  FastLED.addLeds<APA102,(uint8_t) DATA_PIN,(uint8_t) CLOCK_PIN, (EOrder) COLOR_ORDER, (uint32_t) DATA_RATE_MHZ(10)>(leds, (int) NUM_LEDS);
-  FastLED.clear();
-  FastLED.setBrightness(DEFAULT_BRIGHTNESS);
 }
 
 // ##########################################################################################
@@ -90,7 +91,8 @@ void loop()
 
   // Show pictures
   display(message_global, message_brightness, leds);
-
+  
+  //keep alive message
   if(millis() > old_time + 3000)
   {
     printf("Teensy 4.0 alive - time: %d\n", millis());
