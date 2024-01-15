@@ -13,9 +13,6 @@
   * would give 60 num_leds and
   * 150 slices (number of slices you have made your image into)
 */
-#define CHANNEL 20 //CHANNEL: 20 30 40 50 60 70 -> POI (1 2 3 4 5 6) 
-//Poi 1 - 4 -> Teensy 4.0 -> Channel 20 - 50
-//Poi 5 & 6 -> Teensy 3.6 -> Channel 60 & 70
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -23,26 +20,52 @@
 #include <RF24.h>
 #include "FastLED.h"
 #include "pic_array.h"
-#include <teensy_4.0_hardware.h>
-#include <variables_receivers.h>
-#include <visual_functions.h>
-#include <show_decision.h>
-#include <setup_serial_radio.h>
+#include "teensy_4.0_config.h"
+#include "visual_functions.h"
+
+#define PIC_IS_SHOWN 25
+
+uint64_t pipe_address = 1;
+RF24 radio(RF24_CE, RF24_CSN);
+
+// Message Variables
+int message_global = 99; // default message 99 -> Standby RED LED blinking
+int message_brightness = 0;
+int fillupDone = 0;
+int filldownDone = 0;
+
+bool firstStart = true;
+
+CRGB leds[NUM_LEDS];
+
+unsigned int old_time = 0;
 
 void setup()
 {
-    setup_serial_radio();
+  Serial.begin(115200);
+  SPI.setSCK(RF24_SCK);
+  SPI.begin();
+  radio.begin();
+  radio.openReadingPipe(0, pipe_address);
+  radio.setPALevel(RF24_PA_HIGH);
+  radio.setDataRate(RF24_1MBPS);
+  radio.setChannel(CHANNEL);
+  radio.startListening();
+
+  FastLED.addLeds<APA102,(uint8_t) DATA_PIN,(uint8_t) CLOCK_PIN, (EOrder) COLOR_ORDER, (uint32_t) DATA_RATE_MHZ(10)>(leds, (int) NUM_LEDS);
+  FastLED.clear();
+  FastLED.setBrightness(DEFAULT_BRIGHTNESS);
 }
 
-//##########################################################################################
-//                                    MAIN LOOP
-//##########################################################################################
+// ##########################################################################################
+//                                     MAIN LOOP
+// ##########################################################################################
 void loop()
 {
   // Testlight when first start
   if (firstStart)
   {
-    StartDemo();
+    StartDemo(DEFAULT_BRIGHTNESS, leds);
     firstStart = false;
   }
 
@@ -53,9 +76,6 @@ void loop()
     filldownDone = 0;
   }
 
-  //main function to show pictures
-  display(message_global);
-
   // Data Receive
   if (radio.available())
   {
@@ -63,8 +83,19 @@ void loop()
     radio.read(&array1, sizeof(array1));
     message_global = array1[1];
     message_brightness = array1[3];
-    printf("%i\n%i\n%i\n%i\n%i\n",array1[0], array1[1],array1[2],array1[3],array1[4]);
+    printf("%i\n%i\n%i\n%i\n%i\n", array1[0], array1[1], array1[2], array1[3], array1[4]);
     printf("Message Brightness: %i \n", message_brightness);
     printf("Current Millis: %i\n", millis());
   }
+
+  // Show pictures
+  display(message_global, message_brightness, leds);
+
+  if(millis() > old_time + 3000)
+  {
+    printf("Teensy 4.0 alive - time: %d\n", millis());
+    printf("CHANNEL: %d\n", CHANNEL);
+    old_time = millis();
+  }
+
 }

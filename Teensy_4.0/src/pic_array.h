@@ -1,4 +1,5 @@
 
+#include <Arduino.h>
 //DATA-PICTURES
 //Converter: https://www.orchardelica.com/poisonic/poi_page.html
 
