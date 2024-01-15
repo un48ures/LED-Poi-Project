@@ -25,7 +25,7 @@
 
 #define PIC_IS_SHOWN 25
 
-uint64_t pipe_address = 1;
+const byte pipe_address[6] = "00001";
 RF24 radio(RF24_CE, RF24_CSN);
 
 // Message Variables

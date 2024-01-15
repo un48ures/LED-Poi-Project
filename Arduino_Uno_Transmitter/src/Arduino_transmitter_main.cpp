@@ -7,9 +7,11 @@
 */
 
 //#define PRINT_SIGNAL_STRENGTH
-#define MODE 1  //0 -> PRINT_SIGNAL_STRENGTH
+#define MODE 2  //0 -> PRINT_SIGNAL_STRENGTH
                 //1 -> VIDEO_LIGHT
                 //2 -> MIDI_MODE
+                //3 -> SINGAL_STRENGTH + VIDEO_LIGHT
+                //4 -> SERIAL ECHO
 
 
 #include <variables_transmitter.h>
@@ -18,9 +20,8 @@
 #include <videolight.h>
 #include <midi_mode.h>
 
-
-
 RF24 radio(7, 8); // CE, CSN
+int input = 0;
 
 void setup()
 {
@@ -61,5 +62,20 @@ void loop()
 
 #if MODE == 2
   midi_mode(&radio, sizeof(CHs));
+#endif
+
+#if MODE == 3
+  print_signal_strength(&radio, CHs, int(sizeof(CHs)));
+  video_light_mode(&radio);
+#endif
+
+#if MODE == 4
+  if(Serial.available() > 0)
+  {
+    input = Serial.read();
+      //ECHO
+    Serial.print("ECHO: ");
+    Serial.println(input);
+  }
 #endif
 }
