@@ -1,0 +1,6 @@
+#include <FastLED.h>
+
+#define NUM_LEDS 61
+
+CRGB leds[NUM_LEDS];
+FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, COLOR_ORDER, 10000000>(leds, NUM_LEDS);
