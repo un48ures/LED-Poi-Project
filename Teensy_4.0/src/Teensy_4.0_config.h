@@ -10,9 +10,9 @@
 //NRF240 HW Pins - Radio settings
 #define RF24_MOSI 11
 #define RF24_MISO 12
-#define RF24_SCK 13
-#define RF24_CE 4
-#define RF24_CSN 5
+#define RF24_SCK 13 //Clock
+#define RF24_CE 4 //Chip Enable
+#define RF24_CSN 5 //Chip Select
 
 //FastLED HW Pins
 #define NUM_LEDS   61 //number of leds in strip length on one side
