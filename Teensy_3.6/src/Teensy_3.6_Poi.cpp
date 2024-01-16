@@ -13,28 +13,48 @@
 * would give 60 num_leds and 
 * 150 slices (number of slices you have made your image into) 
 */
-#define CHANNEL 60 //CHANNEL: 20 30 40 50 60 70 -> POI (1 2 3 4 5 6) 
-//Poi 1 - 4 -> Teensy 4.0 -> Channel 20 - 50
-//Poi 5 & 6 -> Teensy 3.6 -> Channel 60 & 70
 
 #include <Arduino.h>
 #include <SPI.h>
 // #include <nRF24L01.h>
 #include <RF24.h>
 #include "FastLED.h"
-#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\pic_array.h"
-#include <teensy_3.6_hardware.h>
-#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\variables_receivers.h"
+#include <teensy_3.6_config.h>
 #include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\visual_functions.h"
-#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\show_decision.h"
-#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\setup_serial_radio.h"
+#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\visual_functions.cpp"
+
 //#include "send_voltage.h"
 
+#define PIC_IS_SHOWN 25
 
+const byte pipe_address[6] = "00001";
+RF24 radio(RF24_CE, RF24_CSN);
+CRGB leds[NUM_LEDS];
+
+// Message Variables
+int message_global = 99; // default message 99 -> Standby RED LED blinking
+int message_brightness = 0;
+int fillupDone = 0;
+int filldownDone = 0;
+bool firstStart = true;
+unsigned int old_time = 0;
 
 void setup() 
 {
-  setup_serial_radio();
+  Serial.begin(115200);                     //Serial
+  printf("Initializing...");    
+  SPI.setSCK(RF24_SCK);                     //SPI
+  SPI.begin();
+  delay(200);                               //LED
+  FastLED.addLeds<APA102,(uint8_t) DATA_PIN,(uint8_t) CLOCK_PIN, (EOrder) COLOR_ORDER, (uint32_t) DATA_RATE_MHZ(10)>(leds, (int) NUM_LEDS);
+  FastLED.clear();
+  FastLED.setBrightness(DEFAULT_BRIGHTNESS);
+  radio.begin();                            //radio
+  radio.openReadingPipe(0, pipe_address);
+  radio.setPALevel(RF24_PA_HIGH);
+  radio.setDataRate(RF24_1MBPS);
+  radio.setChannel(CHANNEL);
+  radio.startListening();
 }
 
 
@@ -46,7 +66,7 @@ void setup()
 void loop() {
   //Testlight when first start
   if (firstStart) {
-    StartDemo();
+    StartDemo(DEFAULT_BRIGHTNESS, leds);
     firstStart = false;
   }
 
@@ -55,11 +75,8 @@ void loop() {
     fillupDone = 0;
     filldownDone = 0;
   }
-  
-  //main function to show pictures
-  display(message_global);
 
-//Data Receive
+  //Data Receive
   if (radio.available()) {
     byte array1[5];
     radio.read(&array1, sizeof(array1));
@@ -73,5 +90,15 @@ void loop() {
     printf("Message Brightness: %i \n", message_brightness);
     printf("Current Millis: %i\n", millis());
   }
-  //digitalWrite(ledPin, LOW);
+
+  // Show pictures
+  display(message_global, message_brightness, leds);
+
+  //keep alive message
+  if(millis() > old_time + 3000)
+  {
+    printf("Teensy 4.0 alive - time: %d\n", millis());
+    printf("CHANNEL: %d\n", CHANNEL);
+    old_time = millis();
+  }
 }

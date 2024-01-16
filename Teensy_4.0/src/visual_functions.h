@@ -1,4 +1,4 @@
-#include <types.h>
+#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\types.h"
 #include <FastLED.h>
 
 #define DEFAULT_TIME 25

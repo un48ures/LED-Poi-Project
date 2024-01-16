@@ -27,18 +27,16 @@
 
 const byte pipe_address[6] = "00001";
 RF24 radio(RF24_CE, RF24_CSN);
+CRGB leds[NUM_LEDS];
 
 // Message Variables
 int message_global = 99; // default message 99 -> Standby RED LED blinking
 int message_brightness = 0;
 int fillupDone = 0;
 int filldownDone = 0;
-
 bool firstStart = true;
-
-CRGB leds[NUM_LEDS];
-
 unsigned int old_time = 0;
+
 
 void setup()
 {
@@ -99,5 +97,4 @@ void loop()
     printf("CHANNEL: %d\n", CHANNEL);
     old_time = millis();
   }
-
 }
