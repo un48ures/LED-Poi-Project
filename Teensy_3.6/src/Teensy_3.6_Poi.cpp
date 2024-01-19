@@ -77,16 +77,13 @@ void loop() {
   }
 
   //Data Receive
-  if (radio.available()) {
+  if (radio.available()) 
+  {
     byte array1[5];
     radio.read(&array1, sizeof(array1));
     message_global = array1[1];
     message_brightness = array1[3];
-    Serial.println(array1[0]);
-    Serial.println(array1[1]);
-    Serial.println(array1[2]);
-    Serial.println(array1[3]);
-    Serial.println(array1[4]);
+    printf("%i\n%i\n%i\n%i\n%i\n", array1[0], array1[1], array1[2], array1[3], array1[4]);
     printf("Message Brightness: %i \n", message_brightness);
     printf("Current Millis: %i\n", millis());
   }
