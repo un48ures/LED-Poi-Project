@@ -7,7 +7,7 @@
 */
 
 //#define PRINT_SIGNAL_STRENGTH
-#define MODE 2  //0 -> PRINT_SIGNAL_STRENGTH
+#define MODE 1  //0 -> PRINT_SIGNAL_STRENGTH
                 //1 -> VIDEO_LIGHT
                 //2 -> MIDI_MODE
                 //3 -> SINGAL_STRENGTH + VIDEO_LIGHT

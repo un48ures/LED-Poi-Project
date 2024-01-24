@@ -23,7 +23,7 @@ void video_light_mode(RF24* radio)
     brightness_old = brightness;
     program_old = program;
 
-    if (program > 20)
+    if (program > 30)
     {
       program = 0;
     }
@@ -39,7 +39,7 @@ void video_light_mode(RF24* radio)
     case 0:
       for (uint8_t i = 0; i < sizeof(CHs); i++)
       {
-        data_array[1] = 0;
+        data_array[1] = 0; // Black
         send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
         data_array[1] = 99;
         send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
@@ -53,6 +53,7 @@ void video_light_mode(RF24* radio)
         data_array[3] = brightness;
         send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
       }
+      delay(100);
       break;
     }
   }
