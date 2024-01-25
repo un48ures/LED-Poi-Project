@@ -18,7 +18,7 @@ void video_light_mode(RF24* radio)
   }
 
   // If change then send
-  if (brightness_old != brightness || program_old != program || program > 20)
+  if (brightness_old != brightness || program_old != program)
   {
     brightness_old = brightness;
     program_old = program;
@@ -41,7 +41,7 @@ void video_light_mode(RF24* radio)
       {
         data_array[1] = 0; // Black
         send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
-        data_array[1] = 99;
+        data_array[1] = 99; // Blink red 1st LED Pixel
         send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
       }
       break;
@@ -53,7 +53,6 @@ void video_light_mode(RF24* radio)
         data_array[3] = brightness;
         send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
       }
-      delay(100);
       break;
     }
   }
