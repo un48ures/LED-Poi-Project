@@ -35,7 +35,7 @@ void setup()
 
   // Radio configuration
   radio.begin();
-  radio.setPALevel(RF24_PA_MIN);
+  radio.setPALevel(RF24_PA_HIGH);
   radio.setDataRate(RF24_1MBPS);
   radio.setRetries(4, 2); //One retry as default
   radio.stopListening();
