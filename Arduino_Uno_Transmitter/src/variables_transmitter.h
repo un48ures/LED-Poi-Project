@@ -6,11 +6,11 @@
 
 // Radio configuration settings
 const byte pipe_address[6] = "00001";         // Pipe address
-const byte CHs[6] = {20, 30, 40, 50, 60, 70}; // Channels of pois 1-6
+const byte CHs[6] = {20, 21, 22, 23, 24, 25}; // Channels of pois 1-6
 
 // NoteOn+Kanal, Note, Pitch-Bend cmd, Pitch-Bend val1,val2
 int data0 = 0;
-byte data_array[5] = {1, 2, 3, 4, 5}; // data array for manuel control via button and poti
+byte data_array[5] = {0}; // data array for manuel control via button and poti
 byte array0[6][5] = {};
 
 int brightness = 0;

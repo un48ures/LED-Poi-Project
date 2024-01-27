@@ -8,7 +8,6 @@ void send_data(uint8_t ch, byte *content, uint8_t size, const uint8_t *pipe_addr
     digitalWrite(LED_RED, HIGH);
     radio->setChannel(ch);
     radio->openWritingPipe(pipe_address);
-    uint8_t size_1 = (uint8_t)sizeof(*content);
     int status = radio->write(content, size);
     digitalWrite(LED_RED, LOW);
 #define DEBUG_SEND

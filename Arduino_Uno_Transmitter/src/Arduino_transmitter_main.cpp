@@ -7,7 +7,7 @@
 */
 
 //#define PRINT_SIGNAL_STRENGTH
-#define MODE 1  //0 -> PRINT_SIGNAL_STRENGTH
+#define MODE 0  //0 -> PRINT_SIGNAL_STRENGTH
                 //1 -> VIDEO_LIGHT
                 //2 -> MIDI_MODE
                 //3 -> SINGAL_STRENGTH + VIDEO_LIGHT
@@ -35,9 +35,9 @@ void setup()
 
   // Radio configuration
   radio.begin();
-  radio.setPALevel(RF24_PA_HIGH);
+  radio.setPALevel(RF24_PA_MAX);
   radio.setDataRate(RF24_1MBPS);
-  radio.setRetries(4, 2); //One retry as default
+  radio.setRetries(10, 5); //One retry as default
   radio.stopListening();
   radio.openWritingPipe(pipe_address);
 
