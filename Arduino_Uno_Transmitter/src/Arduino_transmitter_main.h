@@ -15,4 +15,12 @@ enum HW_PINS
     TASTER = 3
 };
 
+typedef struct RF_Message{
+    byte mode;
+    byte picture_hue;
+    byte saturation;
+    byte value_brightness;
+    byte velocity;
+}RF_Message;
+
 #endif
