@@ -12,13 +12,14 @@
                 //2 -> MIDI_MODE
                 //3 -> SINGAL_STRENGTH + VIDEO_LIGHT
                 //4 -> SERIAL ECHO
+                //5 -> NEW REMOTE CONTROL MODE
 
 
 #include <variables_transmitter.h>
 #include <signal_strength_test.h>
 #include <send_data.h>
 #include <videolight.h>
-#include <midi_mode.h>
+#include <modes.h>
 
 RF24 radio(7, 8); // CE, CSN
 int input = 0;
@@ -37,7 +38,7 @@ void setup()
   radio.begin();
   radio.setPALevel(RF24_PA_MAX);
   radio.setDataRate(RF24_1MBPS);
-  radio.setRetries(10, 5); //One retry as default
+  radio.setRetries(1, 1); //One retry as default after 250us
   radio.stopListening();
   radio.openWritingPipe(pipe_address);
 
@@ -77,5 +78,9 @@ void loop()
     Serial.print("ECHO: ");
     Serial.println(input);
   }
+#endif
+
+#if MODE == 5
+  new_remote_control();
 #endif
 }

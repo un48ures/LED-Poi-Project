@@ -3,7 +3,7 @@
 
 #include <FastLED.h>
 
-#define CHANNEL 23 // CHANNEL: 20 30 40 50 60 70 -> POI (1 2 3 4 5 6)
+#define CHANNEL 40 // CHANNEL: 20 30 40 50 60 70 -> POI (1 2 3 4 5 6)
 // Poi 1 - 4 -> Teensy 4.0 -> Channel 20 - 50
 // Poi 5 & 6 -> Teensy 3.6 -> Channel 60 & 70
 

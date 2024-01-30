@@ -1,6 +1,6 @@
 
 #include <RF24.h>
-const uint16_t num_test_bytes = 255;
+const uint16_t num_test_bytes = 32;
 const uint16_t repititions = 100;
 
 
