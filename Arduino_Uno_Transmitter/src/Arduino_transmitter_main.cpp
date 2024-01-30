@@ -15,14 +15,10 @@
                 //5 -> NEW REMOTE CONTROL MODE
 
 
-#include <variables_transmitter.h>
-#include <signal_strength_test.h>
-#include <send_data.h>
-#include <videolight.h>
+#include <Arduino_transmitter_main.h>
 #include <modes.h>
 
 RF24 radio(7, 8); // CE, CSN
-int input = 0;
 
 void setup()
 {
@@ -73,7 +69,7 @@ void loop()
 #if MODE == 4
   if(Serial.available() > 0)
   {
-    input = Serial.read();
+    int input = Serial.read();
       //ECHO
     Serial.print("ECHO: ");
     Serial.println(input);
