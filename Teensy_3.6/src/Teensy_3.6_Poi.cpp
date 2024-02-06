@@ -20,8 +20,8 @@
 #include <RF24.h>
 #include "FastLED.h"
 #include <teensy_3.6_config.h>
-#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\visual_functions.h"
-#include "C:\Users\felix\Documents\PlatformIO\Projects\Teensy_4.0\src\visual_functions.cpp"
+#include "..\..\Teensy_4.0\src\visual_functions.h"
+#include "..\..\Teensy_4.0\src\visual_functions.cpp"
 
 //#include "send_voltage.h"
 
