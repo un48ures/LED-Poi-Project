@@ -33,9 +33,11 @@ void setup()
   // Radio configuration
   radio.begin();
   radio.setPALevel(RF24_PA_MAX);
-  radio.setDataRate(RF24_1MBPS);
+  radio.setDataRate(RF24_1MBPS); //250kbs makes problems
   radio.setRetries(1, 1); //One retry as default after 250us
   radio.stopListening();
+  radio.setChannel(10); //predefine default Channel
+  // radio.enableAckPayload(); // request Acknoledge Payload from the receivers
   radio.openWritingPipe(pipe_address);
 
   // Set LEDs

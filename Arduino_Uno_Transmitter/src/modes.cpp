@@ -171,7 +171,7 @@ void send_data(uint8_t ch, byte *content, uint8_t size, const uint8_t *pipe_addr
 }
 
 const uint16_t num_test_bytes = 32;
-const uint16_t repititions = 100;
+const uint16_t repititions = 1;
 
 
 /// @brief Sending every poi 100 packets and checking how much got received successfully.
@@ -184,23 +184,31 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
     static unsigned long old_time = 0;
     if (millis() > (old_time + 3000))
     {
-        radio->setRetries(0, 0); // No retries allowed
+        radio->setRetries(1, 1); // No retries allowed
         for (int j = 0; j < ch_total; j++)
         {
-            char buffer[num_test_bytes] = {0};
+            char buffer[num_test_bytes] = {1};
             int counter = 0;
             radio->setChannel(CHs[j]);
 
             unsigned long startTime, endTime;
             float speed;
             int signalStrength;
+            int TeensyData = 0;
             uint8_t status = 0;
             startTime = millis();
             for (uint8_t i = 0; i < repititions; i++)
             {
                 status = radio->write(buffer, sizeof(buffer)); // send x bytes of data. It does not matter what it is
                 if (status)
+                {
                     counter++;
+                    if (radio->isAckPayloadAvailable())
+                    {
+                      Serial.println("Got ACK PAYLOAD");
+                      radio->read(&TeensyData, sizeof(TeensyData));
+                    }
+                }
 
                 // delay(1); // try again in 1 millisecond
             }
@@ -220,7 +228,9 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
             Serial.print(" ms ");
             Serial.print("\t Data: ");
             Serial.print((float)counter * num_test_bytes / 1000.0);
-            Serial.println(" kB");
+            Serial.print(" kB");
+            Serial.print("\t TeensyData: ");
+            Serial.println(TeensyData);
         }
         Serial.println(" ");
         old_time = millis();
