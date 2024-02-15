@@ -37,7 +37,7 @@ void setup()
   radio.setRetries(1, 1); //One retry as default after 250us
   radio.stopListening();
   radio.setChannel(10); //predefine default Channel
-  // radio.enableAckPayload(); // request Acknoledge Payload from the receivers
+  radio.enableAckPayload(); // request Acknoledge Payload from the receivers
   radio.openWritingPipe(pipe_address);
 
   // Set LEDs

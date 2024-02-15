@@ -40,7 +40,7 @@ int filldownDone = 0;
 bool firstStart = true;
 unsigned int old_time = 0;
 float voltage = 0;
-int TeensyData = 0;
+int TeensyData = -1;
 
 
 void setup()
@@ -58,7 +58,7 @@ void setup()
   radio.setPALevel(RF24_PA_HIGH);
   radio.setDataRate(RF24_1MBPS);
   radio.setChannel(CHANNEL);
-  // radio.enableAckPayload(); // Send AckPayload to Master/Arduino
+  radio.enableAckPayload(); // Send AckPayload to Master/Arduino
   radio.writeAckPayload(0, &TeensyData, sizeof(TeensyData));
   radio.startListening();
 }
@@ -85,14 +85,16 @@ void loop()
   // Data Receive
   if (radio.available())
   {
-    byte array1[5];
+    byte array1[5] = {0};
     radio.read(&array1, sizeof(array1));
+    int status_register = radio.flush_rx();
     message_global = array1[1];
     message_brightness = array1[3];
     printf("%i\n%i\n%i\n%i\n%i\n", array1[0], array1[1], array1[2], array1[3], array1[4]);
     printf("Message Brightness: %i (Byte[3])\n", message_brightness);
     printf("Current Millis: %i\n", millis());
-    //radio.writeAckPayload(0, &TeensyData, sizeof(TeensyData));
+    printf("Current value of status register flush_rx = %d", status_register);
+    radio.writeAckPayload(0, &TeensyData, sizeof(TeensyData));
   }
 
   // Show pictures
@@ -102,8 +104,7 @@ void loop()
   if(millis() > old_time + 3000)
   {
     voltage = (analogRead(A0)/1024.0) * 3.3 * 2; //3.3V Ref Voltage + 1/2 Voltage Divider
-    // TeensyData = analogRead(A0);
-    // radio.writeAckPayload(0, &TeensyData, sizeof(TeensyData));
+    TeensyData = analogRead(A0);
     printf("\nTeensy 4.0 alive - time: %d\n", millis());
     printf("CHANNEL: %d - VOLTAGE: %f\n\n", CHANNEL, voltage);
     old_time = millis();

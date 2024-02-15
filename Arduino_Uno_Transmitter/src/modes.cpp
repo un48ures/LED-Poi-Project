@@ -171,7 +171,7 @@ void send_data(uint8_t ch, byte *content, uint8_t size, const uint8_t *pipe_addr
 }
 
 const uint16_t num_test_bytes = 32;
-const uint16_t repititions = 1;
+const uint16_t repititions = 100;
 
 
 /// @brief Sending every poi 100 packets and checking how much got received successfully.
@@ -184,12 +184,13 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
     static unsigned long old_time = 0;
     if (millis() > (old_time + 3000))
     {
-        radio->setRetries(1, 1); // No retries allowed
+        radio->setRetries(0, 0); // No retries allowed
         for (int j = 0; j < ch_total; j++)
         {
             char buffer[num_test_bytes] = {1};
             int counter = 0;
             radio->setChannel(CHs[j]);
+            // radio->enableAckPayload();
 
             unsigned long startTime, endTime;
             float speed;
@@ -205,12 +206,10 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
                     counter++;
                     if (radio->isAckPayloadAvailable())
                     {
-                      Serial.println("Got ACK PAYLOAD");
                       radio->read(&TeensyData, sizeof(TeensyData));
                     }
+                    radio->flush_rx();
                 }
-
-                // delay(1); // try again in 1 millisecond
             }
             endTime = millis();
             speed = (float) counter * num_test_bytes / (endTime - startTime);
@@ -229,8 +228,9 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
             Serial.print("\t Data: ");
             Serial.print((float)counter * num_test_bytes / 1000.0);
             Serial.print(" kB");
-            Serial.print("\t TeensyData: ");
-            Serial.println(TeensyData);
+            Serial.print("\t Voltage: ");
+            Serial.print(TeensyData/1024.0*2.0*3.3);
+            Serial.println(" V");
         }
         Serial.println(" ");
         old_time = millis();
