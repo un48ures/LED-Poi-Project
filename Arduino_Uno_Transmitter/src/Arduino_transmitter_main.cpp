@@ -5,20 +5,13 @@
   by Felix Geisler
   16.03.2022
 */
-
-//#define PRINT_SIGNAL_STRENGTH
-#define MODE 0  //0 -> PRINT_SIGNAL_STRENGTH
-                //1 -> VIDEO_LIGHT
-                //2 -> MIDI_MODE
-                //3 -> SINGAL_STRENGTH + VIDEO_LIGHT
-                //4 -> SERIAL ECHO
-                //5 -> NEW REMOTE CONTROL MODE
-
-
 #include <Arduino_transmitter_main.h>
 #include <modes.h>
 
 RF24 radio(7, 8); // CE, CSN
+int mode = 0;
+message message_from_pc;
+receiver teensy[NUM_RECEIVERS];
 
 void setup()
 {
@@ -47,38 +40,48 @@ void setup()
   digitalWrite(LED_GREEN, LOW);
   digitalWrite(LED_RED, LOW);
   digitalWrite(LED_GREEN, HIGH);
+
+  for(int i=0; i<NUM_RECEIVERS;i++)
+  {
+      teensy[i].channel = CHs[i];
+  }
+   
 }
 
 void loop()
 {
-#if MODE == 0
-  print_signal_strength(&radio, CHs, int(sizeof(CHs)));
-#endif
+  // Read incoming serial message from PC and save it in
+  // get_serial_message(&message_from_pc);
+  // mode = message_from_pc.mode;
 
-#if MODE == 1
-  video_light_mode(&radio);
-#endif
+  switch (mode){
+     case 0:
+      print_signal_strength(&radio, teensy, NUM_RECEIVERS); // send x empty bytes and count ack
+      break;
 
-#if MODE == 2
-  midi_mode(&radio, sizeof(CHs));
-#endif
+    case 1:
+      video_light_mode(&radio, teensy); // control manually - change colors and pictures
+      break;
 
-#if MODE == 3
-  print_signal_strength(&radio, CHs, int(sizeof(CHs)));
-  video_light_mode(&radio);
-#endif
+    case 2:
+      midi_mode(&radio, sizeof(CHs), teensy); // legacy mode to control via MIDI bridge and Studio One Piano
+      break;                          // not working here
 
-#if MODE == 4
-  if(Serial.available() > 0)
-  {
-    int input = Serial.read();
-      //ECHO
-    Serial.print("ECHO: ");
-    Serial.println(input);
+    case 3:
+      if(Serial.available() > 0)  // debug mode - print incoming messages over serial
+      {
+        int input = Serial.read();
+          //ECHO
+        Serial.print("ECHO: ");
+        Serial.println(input);
+      }
+      break;
+
+    case 4:
+      new_remote_control(); // new control protocol for teensys
+      break;
+
+    default:
+    break;
   }
-#endif
-
-#if MODE == 5
-  new_remote_control();
-#endif
 }

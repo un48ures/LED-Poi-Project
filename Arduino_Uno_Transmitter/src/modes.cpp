@@ -24,7 +24,7 @@ byte array0[6][5] = {};
 int brightness = 0;
 int brightness_old = 0;
 
-void midi_mode(RF24 *radio, int total_number_receivers)
+void midi_mode(RF24 *radio, int total_number_receivers, receiver* teensy)
 {
     // HAUPTFUNKTION:
     // Das Musik-Programm sendet Töne und deren Pitch-Bend über MIDI/Seriell an den Arduino
@@ -43,7 +43,7 @@ void midi_mode(RF24 *radio, int total_number_receivers)
             array0[data0 - NOTE_ON][0] = data0;
             array0[data0 - NOTE_ON][1] = Serial.read();
             
-            send_data(CHs[data0 - NOTE_ON], array0[data0 - NOTE_ON], sizeof(array0[data0 - NOTE_ON]), pipe_address, radio);
+            send_data(&teensy[data0 - NOTE_ON], array0[data0 - NOTE_ON], sizeof(array0[data0 - NOTE_ON]), pipe_address, radio, 1, 1);
             
             //LED RED blink when data is send
             digitalWrite(LED_RED, HIGH);
@@ -61,7 +61,7 @@ void midi_mode(RF24 *radio, int total_number_receivers)
     }
 }
 
-void video_light_mode(RF24* radio)
+void video_light_mode(RF24* radio, receiver* teensy)
 {
   // Read poti analog input
   brightness = map(analogRead(poti), 0, 1023, 0, 50);
@@ -80,7 +80,7 @@ void video_light_mode(RF24* radio)
     button_state_old = LOW;
   }
 
-  // If change then send
+  // Send on change of program or brightness value
   if (brightness_old != brightness || program_old != program)
   {
     brightness_old = brightness;
@@ -93,28 +93,25 @@ void video_light_mode(RF24* radio)
 
     Serial.print("Program counter: ");
     Serial.println(program);
-  
-    // data_array[1] = program;
-    // data_array[3] = brightness;
 
     switch (program)
     {
     case 0:
-      for (uint8_t i = 0; i < sizeof(CHs); i++)
+      for (uint8_t i = 0; i < NUM_RECEIVERS; i++)
       {
         data_array[1] = 0; // Black
-        send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
+        send_data(&teensy[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio, 1, 1);
         data_array[1] = 99; // Blink red 1st LED Pixel
-        send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
+        send_data(&teensy[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio, 1, 1);
       }
       break;
 
     default:
-      for (uint8_t i = 0; i < sizeof(CHs); i++)
+      for (uint8_t i = 0; i < NUM_RECEIVERS; i++)
       {
         data_array[1] = program;
         data_array[3] = brightness;
-        send_data(CHs[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio);
+        send_data(&teensy[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio, 1, 1);
       }
       break;
     }
@@ -127,40 +124,51 @@ void video_light_mode(RF24* radio)
 //}
 
 /// @brief Send data via the transceiver module
-/// @param ch Target channel number
+/// @param teensy Target
 /// @param pipe_address Pipe_Address; usually fixed; theoretically 6 different pipes possible
 /// @param content data array with 5 bytes to be send
 /// @param size Size of data_array (content) - must be calculated out of this function
-void send_data(uint8_t ch, byte *content, uint8_t size, const uint8_t *pipe_address, RF24 *radio)
+int send_data(receiver* teensy, byte *data, uint8_t size, const uint8_t *pipe_address, RF24 *radio, int retries, int retry_delay)
 {
     digitalWrite(LED_RED, HIGH);
-    radio->setChannel(ch);
+    radio->setChannel(teensy->channel);
+    radio->setRetries(retry_delay, retries);
     radio->openWritingPipe(pipe_address);
-    int status = radio->write(content, size);
+    int status = radio->write(data, size);
+    int ackPayload = 0;
+    if (status)
+    {
+        if (radio->isAckPayloadAvailable())
+        {
+          radio->read(&ackPayload, sizeof(ackPayload));
+          teensy->voltage = ackPayload/1024.0*2.0*3.3;
+        }
+        radio->flush_rx();
+    }
     digitalWrite(LED_RED, LOW);
-#define DEBUG_SEND
+//#define DEBUG_SEND
 #ifdef DEBUG_SEND
-    Serial.print("Content: ");
-    Serial.print(content[0]);
+    Serial.print("Data: ");
+    Serial.print(data[0]);
     Serial.print(" ");
-    Serial.print(content[1]);
+    Serial.print(data[1]);
     Serial.print(" ");
-    Serial.print(content[2]);
+    Serial.print(data[2]);
     Serial.print(" ");
-    Serial.print(content[3]);
+    Serial.print(data[3]);
     Serial.print(" ");
-    Serial.print(content[4]);
-    Serial.print("\t to channel: ");
-    Serial.print(ch);
-    Serial.print(" via pipe: ");
+    Serial.print(data[4]);
+    Serial.print("\t to channel:");
+    Serial.print(teensy->channel);
+    Serial.print(" pipe: ");
     Serial.print(pipe_address[0]);
     Serial.print(pipe_address[1]);
     Serial.print(pipe_address[2]);
     Serial.print(pipe_address[3]);
     Serial.print(pipe_address[4]);
     Serial.print(pipe_address[5]);
-    Serial.print("\t send status: ");
-    Serial.println(status);
+    Serial.print(" teensy->voltage: ");
+    Serial.println(teensy->voltage);
     // Serial.print("\t size_1: ");
     // Serial.print(size_1);
     // Serial.print("\t size parameter: ");
@@ -168,10 +176,11 @@ void send_data(uint8_t ch, byte *content, uint8_t size, const uint8_t *pipe_addr
     // Serial.print("\taddress content: ");
     // Serial.println((unsigned int)content, HEX);
 #endif
+  return status;
 }
 
-const uint16_t num_test_bytes = 32;
-const uint16_t repititions = 100;
+const uint16_t num_test_bytes = 10;
+const uint16_t repititions = 10;
 
 
 /// @brief Sending every poi 100 packets and checking how much got received successfully.
@@ -179,36 +188,29 @@ const uint16_t repititions = 100;
 /// @param radio Radio object used to send/receive data
 /// @param CHs Array of all channel numbers
 /// @param ch_total Total count of used channels in CHs array
-void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
+void print_signal_strength(RF24 *radio, receiver *teensy, int8_t total)
 {
     static unsigned long old_time = 0;
     if (millis() > (old_time + 3000))
     {
-        radio->setRetries(0, 0); // No retries allowed
-        for (int j = 0; j < ch_total; j++)
+        //radio->setRetries(0, 0); // No retries allowed
+        for (int j = 0; j < total; j++)
         {
-            char buffer[num_test_bytes] = {1};
+            byte buffer[num_test_bytes] = {0};
             int counter = 0;
-            radio->setChannel(CHs[j]);
-            // radio->enableAckPayload();
-
             unsigned long startTime, endTime;
-            float speed;
-            int signalStrength;
-            int TeensyData = 0;
+            float speed = 0.0;
+            int signalStrength = 0;
             uint8_t status = 0;
+            //radio->setChannel(teensy[j].channel);
             startTime = millis();
             for (uint8_t i = 0; i < repititions; i++)
             {
-                status = radio->write(buffer, sizeof(buffer)); // send x bytes of data. It does not matter what it is
+                //status = radio->write(buffer, sizeof(buffer)); // send x bytes of data. It does not matter what it is
+                status = send_data(&teensy[j], buffer, sizeof(buffer), pipe_address, radio, 0, 0);
                 if (status)
                 {
-                    counter++;
-                    if (radio->isAckPayloadAvailable())
-                    {
-                      radio->read(&TeensyData, sizeof(TeensyData));
-                    }
-                    radio->flush_rx();
+                  counter++;
                 }
             }
             endTime = millis();
@@ -229,11 +231,22 @@ void print_signal_strength(RF24 *radio, const byte *CHs, int8_t ch_total)
             Serial.print((float)counter * num_test_bytes / 1000.0);
             Serial.print(" kB");
             Serial.print("\t Voltage: ");
-            Serial.print(TeensyData/1024.0*2.0*3.3);
+            Serial.print(teensy[j].voltage);
             Serial.println(" V");
         }
         Serial.println(" ");
         old_time = millis();
     }
     // _delay_ms(500);
+}
+
+void get_serial_message(message *message_input){
+  if (Serial.available() > 1){
+      message_input->mode = Serial.read();
+      message_input->receiver_id = Serial.read();
+      message_input->picture_hue = Serial.read();
+      message_input->saturation = Serial.read();
+      message_input->value_brightness = Serial.read();
+      message_input->velocity = Serial.read();
+  }
 }
