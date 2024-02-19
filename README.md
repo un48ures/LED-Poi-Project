@@ -9,5 +9,5 @@ The Arduino sends these commands then further to the LED Pois which then load th
 The original idea came from mortonkopf who used APA102 pixel strips with a Teensy to light paint. He built a tube poi which, when rotated quickly, 
 made the viewer see real colored images because of the persistence of vision (pov).
 
-So I wanted to take it a step further and make a music synchronized controller which controls 6 (at this point) Pois.
+So I wanted to take it a step further and make a music synchronized controller which controls multiple Pois (6 at this point).
 Therefore nRF24L01 2.4Ghz Transceiver moduls were used.
