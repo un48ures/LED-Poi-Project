@@ -7,6 +7,7 @@
 */
 #include <Arduino_transmitter_main.h>
 #include <modes.h>
+#include <LibPrintf.h>
 
 RF24 radio(7, 8); // CE, CSN
 int mode = 0;
