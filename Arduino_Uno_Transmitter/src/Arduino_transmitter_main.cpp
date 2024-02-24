@@ -64,14 +64,14 @@ void loop()
       video_light_mode_HW(&radio, teensy); // control manually - change colors and pictures
       break;
 
-    case 1:
+    case 1: //videolight mode - remote
+    case 2: //picture mode
       pass_on_message(&radio, teensy, message_from_pc);
     break;
 
-    case 2:
-      // midi_mode(&radio, sizeof(CHs), teensy); // legacy mode to control via MIDI bridge and Studio One Piano
-      pass_on_message(&radio, teensy, message_from_pc);
-      break;
+    case 3:
+      signal_strength(&radio, teensy, NUM_RECEIVERS);
+    break;
 
     case 4:
       if(Serial.available() > 0)  // debug mode - print incoming messages over serial

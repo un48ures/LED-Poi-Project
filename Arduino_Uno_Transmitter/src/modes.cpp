@@ -140,11 +140,18 @@ void pass_on_message(RF24* radio, receiver* teensy, message message_from_pc)
   || message_from_pc.value_brightness != old_message.value_brightness
   || message_from_pc.velocity != old_message.velocity)
   {
-    send_data(&teensy[message_from_pc.receiver_id - 1], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
-    printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", (double) teensy[0].voltage, (double) teensy[1].voltage, (double) teensy[2].voltage,
-            (double) teensy[3].voltage, (double) teensy[4].voltage, (double) teensy[5].voltage);
+    send_data(&teensy[message_from_pc.receiver_id - 1], data, (uint8_t) sizeof(data), pipe_address, radio, 5, 2);
+    send_info(teensy);
     old_message = message_from_pc;
   }
+}
+
+void send_info(receiver* teensy)
+{
+  // Battery Levels
+  printf("%.2f %.2f %.2f %.2f %.2f %.2f ", (double) teensy[0].voltage, (double) teensy[1].voltage, (double) teensy[2].voltage, (double) teensy[3].voltage, (double) teensy[4].voltage, (double) teensy[5].voltage);
+  // Signal Strength
+  printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", (double) teensy[0].signalStrength, (double) teensy[1].signalStrength, (double) teensy[2].signalStrength, (double) teensy[3].signalStrength, (double) teensy[4].signalStrength, (double) teensy[5].signalStrength);
 }
 
 
@@ -160,6 +167,7 @@ int send_data(receiver* teensy, byte *data, uint8_t size, const uint8_t *pipe_ad
     radio->setRetries(retry_delay, retries);
     radio->openWritingPipe(pipe_address);
     int status = radio->write(data, size);
+    teensy->signalStrength = (1 - (radio->getARC()) / (float) retries) * 100.0;
     int ackPayload = 0;
     if (status)
     {
@@ -204,8 +212,8 @@ int send_data(receiver* teensy, byte *data, uint8_t size, const uint8_t *pipe_ad
   return status;
 }
 
-const uint16_t num_test_bytes = 10;
-const uint16_t repititions = 10;
+const uint16_t num_test_bytes = 20;
+const uint16_t repititions = 100;
 
 
 /// @brief Sending every poi 100 packets and checking how much got received successfully.
@@ -213,7 +221,7 @@ const uint16_t repititions = 10;
 /// @param radio Radio object used to send/receive data
 /// @param CHs Array of all channel numbers
 /// @param ch_total Total count of used channels in CHs array
-void print_signal_strength(RF24 *radio, receiver *teensy, int8_t total)
+void signal_strength(RF24 *radio, receiver *teensy, int8_t total)
 {
     static unsigned long old_time = 0;
     if (millis() > (old_time + 3000))
@@ -241,28 +249,29 @@ void print_signal_strength(RF24 *radio, receiver *teensy, int8_t total)
             endTime = millis();
             speed = (float) counter * num_test_bytes / (endTime - startTime);
             signalStrength = (float)counter / repititions * 100.0;
-            Serial.print("Channel:");
-            Serial.print(CHs[j]);
-            Serial.print("\t");
-            Serial.print("Signal strength: ");
-            Serial.print(signalStrength);
-            Serial.print(" %\t Speed: ");
-            Serial.print(speed);
-            Serial.print(" kB/s");
-            Serial.print("\t Duration: ");
-            Serial.print(endTime - startTime);
-            Serial.print(" ms ");
-            Serial.print("\t Data: ");
-            Serial.print((float)counter * num_test_bytes / 1000.0);
-            Serial.print(" kB");
-            Serial.print("\t Voltage: ");
-            Serial.print(teensy[j].voltage);
-            Serial.println(" V");
+            teensy[j].signalStrength = signalStrength;
+            // Serial.print("Channel:");
+            // Serial.print(CHs[j]);
+            // Serial.print("\t");
+            // Serial.print("Signal strength: ");
+            // Serial.print(signalStrength);
+            // Serial.print(" %\t Speed: ");
+            // Serial.print(speed);
+            // Serial.print(" kB/s");
+            // Serial.print("\t Duration: ");
+            // Serial.print(endTime - startTime);
+            // Serial.print(" ms ");
+            // Serial.print("\t Data: ");
+            // Serial.print((float)counter * num_test_bytes / 1000.0);
+            // Serial.print(" kB");
+            // Serial.print("\t Voltage: ");
+            // Serial.print(teensy[j].voltage);
+            // Serial.println(" V");
         }
-        Serial.println(" ");
+        // Serial.println(" ");
         old_time = millis();
+        send_info(teensy);
     }
-    // _delay_ms(500);
 }
 
 void get_serial_message(message *message_input){
@@ -281,13 +290,4 @@ void get_serial_message(message *message_input){
     // printf("saturation %d\n", message_input->saturation);
     // printf("value_brightness %d\n", message_input->value_brightness);
   } 
-}
-
-void picture_mode()
-{
-  ;
-}
-void battery_signal_strength()
-{
-  ;
 }
