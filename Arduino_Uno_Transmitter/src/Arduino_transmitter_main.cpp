@@ -10,7 +10,7 @@
 #include <LibPrintf.h>
 
 RF24 radio(7, 8); // CE, CSN
-int mode = 0;
+int mode = 1; //pass on as default
 message message_from_pc;
 receiver teensy[NUM_RECEIVERS];
 
@@ -51,24 +51,29 @@ void setup()
 
 void loop()
 {
-  // Read incoming serial message from PC and save it in
-  // get_serial_message(&message_from_pc);
-  // mode = message_from_pc.mode;
-
-  switch (mode){
-     case 0:
-      print_signal_strength(&radio, teensy, NUM_RECEIVERS); // send x empty bytes and count ack
+  // Read incoming serial message from PC
+  get_serial_message(&message_from_pc);
+  mode = message_from_pc.mode;
+  // mode 0: videolight mode - hw
+  // mode 1: videolight mode - remote
+  // mode 2: picture mode
+  
+  switch (mode)
+  {
+    case 0:
+      video_light_mode_HW(&radio, teensy); // control manually - change colors and pictures
       break;
 
     case 1:
-      video_light_mode(&radio, teensy); // control manually - change colors and pictures
-      break;
+      pass_on_message(&radio, teensy, message_from_pc);
+    break;
 
     case 2:
-      midi_mode(&radio, sizeof(CHs), teensy); // legacy mode to control via MIDI bridge and Studio One Piano
-      break;                          // not working here
+      // midi_mode(&radio, sizeof(CHs), teensy); // legacy mode to control via MIDI bridge and Studio One Piano
+      pass_on_message(&radio, teensy, message_from_pc);
+      break;
 
-    case 3:
+    case 4:
       if(Serial.available() > 0)  // debug mode - print incoming messages over serial
       {
         int input = Serial.read();
@@ -76,10 +81,6 @@ void loop()
         Serial.print("ECHO: ");
         Serial.println(input);
       }
-      break;
-
-    case 4:
-      new_remote_control(); // new control protocol for teensys
       break;
 
     default:

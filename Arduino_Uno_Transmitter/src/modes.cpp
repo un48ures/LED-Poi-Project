@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <Arduino_transmitter_main.h>
 #include <modes.h>
+#include <LibPrintf.h>
 
 #define NOTE_ON 144
 #define PITCH_BEND 224
@@ -16,9 +17,13 @@ boolean taster_change = 0;
 byte program = 0;     // Mode/Status Zählervariable
 byte program_old = 0; // alter Wert
 
-// NoteOn+Kanal, Note, Pitch-Bend cmd, Pitch-Bend val1,val2
-int data0 = 0;
-byte data_array[5] = {0}; // data array for manuel control via button and poti
+// mode [0-3]
+// picture/hue [0-255]
+// saturation [0-255]
+// value_brightness [0-255]
+// velocity [0-255]
+byte data[5] = {0}; // data array
+
 byte array0[6][5] = {};
 
 int brightness = 0;
@@ -61,7 +66,7 @@ void midi_mode(RF24 *radio, int total_number_receivers, receiver* teensy)
     }
 }
 
-void video_light_mode(RF24* radio, receiver* teensy)
+void video_light_mode_HW(RF24* radio, receiver* teensy)
 {
   // Read poti analog input
   brightness = map(analogRead(poti), 0, 1023, 0, 50);
@@ -91,37 +96,57 @@ void video_light_mode(RF24* radio, receiver* teensy)
       program = 0;
     }
 
-    Serial.print("Program counter: ");
-    Serial.println(program);
+    // Serial.print("Program counter: ");
+    // Serial.println(program);
 
     switch (program)
     {
     case 0:
       for (uint8_t i = 0; i < NUM_RECEIVERS; i++)
       {
-        data_array[1] = 0; // Black
-        send_data(&teensy[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio, 1, 1);
-        data_array[1] = 99; // Blink red 1st LED Pixel
-        send_data(&teensy[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio, 1, 1);
+        data[1] = 0; // Black
+        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
+        data[1] = 99; // Blink red 1st LED Pixel
+        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
       }
       break;
 
     default:
       for (uint8_t i = 0; i < NUM_RECEIVERS; i++)
       {
-        data_array[1] = program;
-        data_array[3] = brightness;
-        send_data(&teensy[i], data_array, (uint8_t) sizeof(data_array), pipe_address, radio, 1, 1);
+        data[1] = program;
+        data[3] = brightness;
+        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
       }
       break;
     }
   }
 }
 
-//void new_remote_control()
-//{
-//    Serial.print("Test");
-//}
+void pass_on_message(RF24* radio, receiver* teensy, message message_from_pc)
+{
+  // Serial.print("Video Light Mode - Remote");
+  data[0] = message_from_pc.mode;
+  data[1] = message_from_pc.picture_hue;
+  data[2] = message_from_pc.saturation;
+  data[3] = message_from_pc.value_brightness;
+  data[4] = message_from_pc.velocity;
+  // Send on change:
+  static message old_message;
+  if(message_from_pc.picture_hue != old_message.picture_hue
+  || message_from_pc.mode != old_message.mode
+  || message_from_pc.receiver_id != old_message.receiver_id
+  || message_from_pc.saturation != old_message.saturation
+  || message_from_pc.value_brightness != old_message.value_brightness
+  || message_from_pc.velocity != old_message.velocity)
+  {
+    send_data(&teensy[message_from_pc.receiver_id - 1], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
+    printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", (double) teensy[0].voltage, (double) teensy[1].voltage, (double) teensy[2].voltage,
+            (double) teensy[3].voltage, (double) teensy[4].voltage, (double) teensy[5].voltage);
+    old_message = message_from_pc;
+  }
+}
+
 
 /// @brief Send data via the transceiver module
 /// @param teensy Target
@@ -241,12 +266,28 @@ void print_signal_strength(RF24 *radio, receiver *teensy, int8_t total)
 }
 
 void get_serial_message(message *message_input){
-  if (Serial.available() > 1){
-      message_input->mode = Serial.read();
-      message_input->receiver_id = Serial.read();
-      message_input->picture_hue = Serial.read();
-      message_input->saturation = Serial.read();
-      message_input->value_brightness = Serial.read();
-      message_input->velocity = Serial.read();
-  }
+  if (Serial.available() >= 6)
+  {
+    message_input->mode = Serial.read();
+    message_input->receiver_id = Serial.read();
+    message_input->picture_hue = Serial.read();
+    message_input->saturation = Serial.read();
+    message_input->value_brightness = Serial.read();
+    message_input->velocity = Serial.read();
+    // printf("ECHO: ");
+    // printf("mode %d\n", message_input->mode);
+    // printf("receiver_id %d\n", message_input->receiver_id);
+    // printf("picture_hue %d\n", message_input->picture_hue);
+    // printf("saturation %d\n", message_input->saturation);
+    // printf("value_brightness %d\n", message_input->value_brightness);
+  } 
+}
+
+void picture_mode()
+{
+  ;
+}
+void battery_signal_strength()
+{
+  ;
 }

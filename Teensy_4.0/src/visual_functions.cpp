@@ -418,3 +418,14 @@ void fadetoblack(int message_brightness, CRGB *leds)
   FastLED.show();
   FastLED.delay(15);
 }
+
+void show_color(message msg, CRGB *leds)
+{
+  long tmp = msg.picture_hue * 65000;
+  for (int i = 0; i < NUM_LEDS; i++)
+  {
+    leds[i] = tmp;
+  }
+  FastLED.setBrightness(msg.value_brightness);
+  FastLED.show();
+}

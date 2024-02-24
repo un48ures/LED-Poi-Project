@@ -19,3 +19,4 @@ void addGlitter(char chanceOfGlitter, CRGB* leds);
 void rainbow(int message_brightness, CRGB* leds);
 void fadetoblack(int message_brightness, CRGB* leds);
 void LED_Pulsing(int hue, int message_brightness, CRGB* leds);
+void show_color(message msg, CRGB* leds);

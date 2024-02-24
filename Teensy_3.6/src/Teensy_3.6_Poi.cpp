@@ -29,17 +29,18 @@
 
 const byte pipe_address[6] = "00001";
 RF24 radio(RF24_CE, RF24_CSN);
+
+// LED
 CRGB leds[NUM_LEDS];
 
 // Message Variables
-int message_global = 99; // default message 99 -> Standby RED LED blinking
-int message_brightness = 0;
 int fillupDone = 0;
 int filldownDone = 0;
 bool firstStart = true;
 unsigned int old_time = 0;
 float voltage = 0;
 int TeensyData = -1;
+message msg;
 
 void setup() 
 {
@@ -64,40 +65,47 @@ void setup()
 
 
 
-//##########################################################################################
-//                                    MAIN LOOP
-//##########################################################################################
-void loop() {
-  //Testlight when first start
-  if (firstStart) {
+// ##########################################################################################
+//                                     MAIN LOOP
+// ##########################################################################################
+void loop()
+{
+  // Testlight when first start
+  if (firstStart)
+  {
     StartDemo(DEFAULT_BRIGHTNESS, leds);
     firstStart = false;
   }
 
-  //Reset for Fillup and Filldown function if another pic was shown
-  if (message_global != 8 || message_global != 9) {
-    fillupDone = 0;
-    filldownDone = 0;
-  }
-
-  //Data Receive
-  if (radio.available()) 
+  // Data Receive
+  if (radio.available())
   {
-    byte array1[5] = {0};
-    radio.read(&array1, sizeof(array1));
+    byte data[5] = {0};
+    radio.read(&data, sizeof(data));
     int status_register = radio.flush_rx();
-    message_global = array1[1];
-    message_brightness = array1[3];
-    printf("%i\n%i\n%i\n%i\n%i\n", array1[0], array1[1], array1[2], array1[3], array1[4]);
-    printf("Message Brightness: %i (Byte[3])\n", message_brightness);
+    msg.mode = data[0];
+    msg.picture_hue = data[1];
+    msg.saturation = data[2];
+    msg.value_brightness = data[3];
+    msg.velocity = data[4];
+    printf("%i\n%i\n%i\n%i\n%i\n", data[0], data[1], data[2], data[3], data[4]);
     printf("Current Millis: %i\n", millis());
     printf("Current value of status register flush_rx = %d", status_register);
     radio.writeAckPayload(0, &TeensyData, sizeof(TeensyData));
   }
 
-  // Show pictures
-  display(message_global, message_brightness, leds);
+  // Show HSV COLOR 
+  if(msg.mode == VIDEO_LIGHT_MODE)
+  {
+    show_color(msg, leds);
+  }
 
+  // Show pictures
+  if(msg.mode == PICTURE_MODE)
+  {
+    display(msg.picture_hue, msg.value_brightness, leds);
+  }
+  
   //keep alive message
   if(millis() > old_time + 3000)
   {

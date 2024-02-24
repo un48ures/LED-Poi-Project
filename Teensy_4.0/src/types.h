@@ -3,6 +3,16 @@
  
  #include <Arduino.h>
 
+ #define VIDEO_LIGHT_MODE 1
+ #define PICTURE_MODE 2
+
+typedef struct message{
+    int mode = PICTURE_MODE;
+    int picture_hue = -1;
+    int saturation = 0;
+    int value_brightness = 1;
+    int velocity = 0;
+}message;
 
  typedef enum {
         AliceBlue=0xF0F8FF,

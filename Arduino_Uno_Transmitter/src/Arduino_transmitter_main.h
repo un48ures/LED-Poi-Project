@@ -18,12 +18,12 @@ enum HW_PINS
 };
 
 typedef struct General_Message{
-    byte mode;
-    byte receiver_id;
-    byte picture_hue;
-    byte saturation;
-    byte value_brightness;
-    byte velocity;
+    int mode = 1;
+    int receiver_id;
+    int picture_hue;
+    int saturation;
+    int value_brightness;
+    int velocity;
 }message;
 
 typedef struct receiver{
@@ -34,5 +34,7 @@ typedef struct receiver{
 }receiver;
 
 void get_serial_message(message *input_message);
+void picture_mode();
+void battery_signal_strength();
 
 #endif
