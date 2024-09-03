@@ -4,6 +4,12 @@
 #define DEFAULT_TIME 25
 #define NUM_SLICES 150
 
+typedef struct RGBColor {
+	int r;
+	int g;
+	int b;
+} RGBColor;
+
 void display(int message_global, int message_brightness, CRGB* leds);
 void PoiSonic_old(unsigned long time, const unsigned int array[], int brightness, CRGB* leds);
 void showPicOnce(const unsigned int array[], int brightness, CRGB* leds);
@@ -20,3 +26,4 @@ void rainbow(int message_brightness, CRGB* leds);
 void fadetoblack(int message_brightness, CRGB* leds);
 void LED_Pulsing(int hue, int message_brightness, CRGB* leds);
 void show_color(message msg, CRGB* leds);
+RGBColor hsv2rgb(float H, float S, float V);

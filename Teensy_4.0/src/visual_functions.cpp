@@ -3,6 +3,7 @@
 // #include "types.h"
 #include "FastLED.h"
 #include "pic_array.h"
+#include <RF24.h>
 
 int hue = 0;
 
@@ -421,11 +422,46 @@ void fadetoblack(int message_brightness, CRGB *leds)
 
 void show_color(message msg, CRGB *leds)
 {
-  long tmp = msg.picture_hue * 65000;
+  // long tmp = msg.picture_hue * 65000;
+  // printf("msg.picture_hue = %d\n", msg.picture_hue);
+  RGBColor c = hsv2rgb(msg.picture_hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+
   for (int i = 0; i < NUM_LEDS; i++)
   {
-    leds[i] = tmp;
+    leds[i].r = c.r;
+    leds[i].g = c.g;
+    leds[i].b = c.b;
   }
   FastLED.setBrightness(msg.value_brightness);
   FastLED.show();
+}
+
+RGBColor hsv2rgb(float H, float S, float V) {
+	float r, g, b;
+	
+	float h = H / 360;
+	float s = S / 100;
+	float v = V / 100;
+	
+	int i = floor(h * 6);
+	float f = h * 6 - i;
+	float p = v * (1 - s);
+	float q = v * (1 - f * s);
+	float t = v * (1 - (1 - f) * s);
+	
+	switch (i % 6) {
+		case 0: r = v, g = t, b = p; break;
+		case 1: r = q, g = v, b = p; break;
+		case 2: r = p, g = v, b = t; break;
+		case 3: r = p, g = q, b = v; break;
+		case 4: r = t, g = p, b = v; break;
+		case 5: r = v, g = p, b = q; break;
+	}
+	
+	RGBColor color;
+	color.r = r * 255;
+	color.g = g * 255;
+	color.b = b * 255;
+	
+	return color;
 }
