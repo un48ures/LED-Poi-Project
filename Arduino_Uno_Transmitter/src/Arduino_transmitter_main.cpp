@@ -54,8 +54,8 @@ void loop()
   // Read incoming serial message from PC
   get_serial_message(&message_from_pc);
   mode = message_from_pc.mode;
-  // mode 0: videolight mode - hw
-  // mode 1: videolight mode - remote
+  // mode 0: videolight mode - hw button
+  // mode 1: videolight mode - PC
   // mode 2: picture mode
   
   switch (mode)
@@ -64,8 +64,8 @@ void loop()
       video_light_mode_HW(&radio, teensy); // control manually - change colors and pictures
       break;
 
-    case 1: //videolight mode - remote
-    case 2: //picture mode
+    case 1: // videolight mode - remote
+    case 2: // picture mode
       pass_on_message(&radio, teensy, message_from_pc);
     break;
 

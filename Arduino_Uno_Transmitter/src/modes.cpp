@@ -101,12 +101,12 @@ void pass_on_message(RF24* radio, receiver* teensy, message message_from_pc)
   || message_from_pc.velocity != old_message.velocity)
   {
     send_data(&teensy[message_from_pc.receiver_id - 1], data, (uint8_t) sizeof(data), pipe_address, radio, 5, 2);
-    send_info(teensy);
+    send_receiver_info_to_serial(teensy);
     old_message = message_from_pc;
   }
 }
 
-void send_info(receiver* teensy)
+void send_receiver_info_to_serial(receiver* teensy)
 {
   // Battery Levels
   printf("%.2f %.2f %.2f %.2f %.2f %.2f ", (double) teensy[0].voltage, (double) teensy[1].voltage, (double) teensy[2].voltage, (double) teensy[3].voltage, (double) teensy[4].voltage, (double) teensy[5].voltage);
@@ -172,19 +172,20 @@ int send_data(receiver* teensy, byte *data, uint8_t size, const uint8_t *pipe_ad
   return status;
 }
 
-const uint16_t num_test_bytes = 20;
-const uint16_t repititions = 100;
-
 
 /// @brief Sending every poi 100 packets and checking how much got received successfully.
 ///        Starting at the first element of CHs array for all ch_total count
+/// @param teensy Array with references to all teensy receivers
 /// @param radio Radio object used to send/receive data
-/// @param CHs Array of all channel numbers
-/// @param ch_total Total count of used channels in CHs array
+/// @param total Total count of receivers
 void signal_strength(RF24 *radio, receiver *teensy, int8_t total)
 {
+    const uint16_t num_test_bytes = 20;
+    const uint16_t repititions = 100;
+    const uint16_t time_wait = 3000; // Wait time till the next test
     static unsigned long old_time = 0;
-    if (millis() > (old_time + 3000))
+
+    if (millis() > (old_time + time_wait))
     {
         //radio->setRetries(0, 0); // No retries allowed
         for (int j = 0; j < total; j++)
@@ -195,7 +196,6 @@ void signal_strength(RF24 *radio, receiver *teensy, int8_t total)
             float speed = 0.0;
             int signalStrength = 0;
             uint8_t status = 0;
-            //radio->setChannel(teensy[j].channel);
             startTime = millis();
             for (uint8_t i = 0; i < repititions; i++)
             {
@@ -230,7 +230,7 @@ void signal_strength(RF24 *radio, receiver *teensy, int8_t total)
         }
         // Serial.println(" ");
         old_time = millis();
-        send_info(teensy);
+        send_receiver_info_to_serial(teensy);
     }
 }
 
