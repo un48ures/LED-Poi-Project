@@ -18,7 +18,7 @@
 #include <SPI.h>
 // #include <nRF24L01.h>
 #include <RF24.h>
-#include "FastLED.h"
+// #include "FastLED.h"
 #include <teensy_3.6_config.h>
 #include "..\..\Teensy_4.0\src\visual_functions.h"
 #include "..\..\Teensy_4.0\src\visual_functions.cpp"
@@ -103,7 +103,7 @@ void loop()
   // Show pictures
   if(msg.mode == PICTURE_MODE)
   {
-    display(msg.picture_hue, msg.value_brightness, leds);
+    display(msg, leds);
   }
   
   //keep alive message

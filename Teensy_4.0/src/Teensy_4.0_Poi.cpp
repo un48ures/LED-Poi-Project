@@ -99,7 +99,7 @@ void loop()
   // Show pictures
   if(msg.mode == PICTURE_MODE)
   {
-    display(msg.picture_hue, msg.value_brightness, leds);
+    display(msg, leds);
   }
   
   //keep alive message

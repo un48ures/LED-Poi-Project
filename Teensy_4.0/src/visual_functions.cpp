@@ -35,47 +35,47 @@ extern int filldownDone;
 
 /// @brief Make decision which array to show in relation to the received message_global
 /// @param message_global  contains data which picture/array should be shown
-void display(int message_global, int message_brightness, CRGB *leds)
+void display(message msg, CRGB *leds)
 {
-  switch (message_global)
+  switch (msg.picture_hue)
   {
   case 0:
-    LED_show_color(Black, message_brightness, leds);
+    LED_show_color(Black, msg.value_brightness, leds);
     break;
   case 1:
-    LED_show_color(White, message_brightness, leds);
+    LED_show_color(White, msg.value_brightness, leds);
     break;
   case 2:
-    LED_show_color(Red, message_brightness, leds);
+    LED_show_color(Red, msg.value_brightness, leds);
     break;
   case 3:
-    LED_show_color(Green, message_brightness, leds);
+    LED_show_color(Green, msg.value_brightness, leds);
     break;
   case 4:
-    LED_show_color(Blue, message_brightness, leds);
+    LED_show_color(Blue, msg.value_brightness, leds);
     break;
   case 5:
-    LED_show_color(Purple, message_brightness, leds);
+    LED_show_color(Purple, msg.value_brightness, leds);
     break;
   case 6:
-    LED_show_color(Yellow, message_brightness, leds);
+    LED_show_color(Yellow, msg.value_brightness, leds);
     break;
   case 7:
     // FADE PULSE - BLUE
     hue = 150; // BLUE
-    LED_Pulsing(hue, message_brightness, leds);
+    LED_Pulsing(hue, msg.value_brightness, msg.velocity, leds);
     // delay(50);
     break;
   case 8:
     // FADE PULSE - GREEN
     hue = 100; // GREEN
-    LED_Pulsing(hue, message_brightness, leds);
+    LED_Pulsing(hue, msg.value_brightness, msg.velocity, leds);
     // delay(50);
     break;
   case 9:
     // FADE PULSE - RED
     hue = 255; // GREEN
-    LED_Pulsing(hue, message_brightness, leds);
+    LED_Pulsing(hue, msg.value_brightness, msg.velocity, leds);
     // delay(50);
     break;
 
@@ -87,74 +87,74 @@ void display(int message_global, int message_brightness, CRGB *leds)
   //      LED_filldown();
   //      break;
   case 10:
-    FastLED.setBrightness(message_brightness);
-    rainbow(message_brightness, leds);
+    FastLED.setBrightness(msg.value_brightness);
+    rainbow(msg.value_brightness, leds);
     break;
   case 11:
-    LED_strobo(message_brightness, leds);
+    LED_strobo(msg.value_brightness, msg.velocity, leds);
     break;
   case 12:
-    PoiSonic(DEFAULT_TIME, array1, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array1, msg.value_brightness, leds);
     break;
   case 13:
-    PoiSonic(DEFAULT_TIME, array2, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array2, msg.value_brightness, leds);
     break;
   case 14:
-    PoiSonic(DEFAULT_TIME, array3, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array3, msg.value_brightness, leds);
     break;
   case 15:
-    PoiSonic(DEFAULT_TIME, array4, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array4, msg.value_brightness, leds);
     break;
   case 16:
-    PoiSonic(DEFAULT_TIME, array5, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array5, msg.value_brightness, leds);
     break;
   case 17:
-    PoiSonic(DEFAULT_TIME, array6, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array6, msg.value_brightness, leds);
     break;
   case 18:
-    PoiSonic(DEFAULT_TIME, array7, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array7, msg.value_brightness, leds);
     break;
   case 19:
-    PoiSonic(DEFAULT_TIME, array8, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array8, msg.value_brightness, leds);
     break;
   case 20:
-    PoiSonic(DEFAULT_TIME, array9, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array9, msg.value_brightness, leds);
     break;
   case 21:
-    PoiSonic(DEFAULT_TIME, array10, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array10, msg.value_brightness, leds);
     break;
   case 22:
-    PoiSonic(DEFAULT_TIME, array11, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array11, msg.value_brightness, leds);
     break;
   case 23:
-    PoiSonic(DEFAULT_TIME, array12, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array12, msg.value_brightness, leds);
     break;
   case 24:
-    PoiSonic(DEFAULT_TIME, array13, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array13, msg.value_brightness, leds);
     break;
   case 25:
-    PoiSonic(DEFAULT_TIME, array14, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array14, msg.value_brightness, leds);
     break;
   case 26:
-    PoiSonic(DEFAULT_TIME, array15, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array15, msg.value_brightness, leds);
     break;
   case 27:
-    PoiSonic(DEFAULT_TIME, array16, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array16, msg.value_brightness, leds);
     break;
   case 28:
-    PoiSonic(DEFAULT_TIME, array17, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array17, msg.value_brightness, leds);
     break;
   case 29:
-    PoiSonic(DEFAULT_TIME, array18, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array18, msg.value_brightness, leds);
     break;
   case 30:
-    PoiSonic(DEFAULT_TIME, array19, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array19, msg.value_brightness, leds);
     break;
   case 31:
-    PoiSonic(DEFAULT_TIME, array20, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array20, msg.value_brightness, leds);
     break;
   case 32:
-    PoiSonic(DEFAULT_TIME, array21, message_brightness, leds);
+    PoiSonic(DEFAULT_TIME, array21, msg.value_brightness, leds);
     break;
 
   default:
@@ -305,18 +305,23 @@ void LED_show_color(HTMLColorCode color, int message_brightness, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 // FADE PULSING
 //-------------------------------------------------------------------------------------------------------------
-void LED_Pulsing(int hue, int message_brightness, CRGB *leds)
+void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB *leds)
 {
+  int b_target = message_brightness;
+  if (message_brightness < 10)
+  {
+    b_target = 10;
+  }
   // aufsteigend
   if (looping == 0)
   {
-    for (int j = 0; j < message_brightness; j++)
+    for (int j = 0; j < (velocity / 2); j++)
     {
       //    if (radio.available()) {last_one = 1;}
       for (int i = 0; i < NUM_LEDS; i++)
       {
         leds[i].setHSV(hue, 255, 255);
-        FastLED.setBrightness(j);
+        FastLED.setBrightness((uint8_t) (j / (float) velocity / 2.0 * (float) b_target));
         FastLED.show();
       }
     }
@@ -326,29 +331,29 @@ void LED_Pulsing(int hue, int message_brightness, CRGB *leds)
   // absteigend
   if (looping == 1)
   {
-    for (int j = message_brightness; j > 0; j--)
+    for (int j = (velocity / 2); j > 0; j--)
     {
       for (int i = 0; i < NUM_LEDS; i++)
       {
         leds[i].setHSV(hue, 255, 255);
-        FastLED.setBrightness(j);
+        FastLED.setBrightness((uint8_t) (j / (float) velocity / 2.0 * (float) b_target));
         FastLED.show();
       }
     }
     looping = 0;
-    LED_show_color(Black, message_brightness, leds);
+    LED_show_color(Black, 0, leds);
   }
 }
 
 //-------------------------------------------------------------------------------------------------------------
 // FILL STROBO
 //-------------------------------------------------------------------------------------------------------------
-void LED_strobo(int message_brightness, CRGB *leds)
+void LED_strobo(int message_brightness, int velocity, CRGB *leds)
 {
   LED_show_color(White, message_brightness, leds);
-  delay(50);
+  delay(velocity);
   LED_show_color(Black, message_brightness, leds);
-  delay(50);
+  delay(velocity);
 }
 
 //-------------------------------------------------------------------------------------------------------------
@@ -424,7 +429,7 @@ void show_color(message msg, CRGB *leds)
 {
   // long tmp = msg.picture_hue * 65000;
   // printf("msg.picture_hue = %d\n", msg.picture_hue);
-  RGBColor c = hsv2rgb(msg.picture_hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+  RGBColour c = hsv2rgb(msg.picture_hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
 
   for (int i = 0; i < NUM_LEDS; i++)
   {
@@ -436,8 +441,8 @@ void show_color(message msg, CRGB *leds)
   FastLED.show();
 }
 
-RGBColor hsv2rgb(float H, float S, float V) {
-	float r, g, b;
+RGBColour hsv2rgb(float H, float S, float V) {
+	float r = 0.0, g = 0.0, b = 0.0;
 	
 	float h = H / 360;
 	float s = S / 100;
@@ -458,7 +463,7 @@ RGBColor hsv2rgb(float H, float S, float V) {
 		case 5: r = v, g = p, b = q; break;
 	}
 	
-	RGBColor color;
+	RGBColour color;
 	color.r = r * 255;
 	color.g = g * 255;
 	color.b = b * 255;
