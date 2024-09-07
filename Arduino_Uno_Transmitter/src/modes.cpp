@@ -87,13 +87,15 @@ void pass_on_message(RF24* radio, receiver* teensy, message message_from_pc)
 {
   // Serial.print("Video Light Mode - Remote");
   data[0] = message_from_pc.mode;
-  data[1] = message_from_pc.picture_hue;
-  data[2] = message_from_pc.saturation;
-  data[3] = message_from_pc.value_brightness;
-  data[4] = message_from_pc.velocity;
+  data[1] = message_from_pc.picture;
+  data[2] = message_from_pc.hue;
+  data[3] = message_from_pc.saturation;
+  data[4] = message_from_pc.value_brightness;
+  data[5] = message_from_pc.velocity;
   // Send on change:
   static message old_message;
-  if(message_from_pc.picture_hue != old_message.picture_hue
+  if(message_from_pc.picture != old_message.picture
+  || message_from_pc.hue != old_message.hue
   || message_from_pc.mode != old_message.mode
   || message_from_pc.receiver_id != old_message.receiver_id
   || message_from_pc.saturation != old_message.saturation
@@ -235,11 +237,12 @@ void signal_strength(RF24 *radio, receiver *teensy, int8_t total)
 }
 
 void get_serial_message(message *message_input){
-  if (Serial.available() >= 6)
+  if (Serial.available() >= 7) // 7 makes sense?
   {
     message_input->mode = Serial.read();
     message_input->receiver_id = Serial.read();
-    message_input->picture_hue = Serial.read();
+    message_input->picture = Serial.read();
+    message_input->hue = Serial.read();
     message_input->saturation = Serial.read();
     message_input->value_brightness = Serial.read();
     message_input->velocity = Serial.read();

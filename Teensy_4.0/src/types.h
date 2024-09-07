@@ -8,7 +8,8 @@
 
 typedef struct message{
     int mode = PICTURE_MODE;
-    int picture_hue = -1;
+    int picture = -1;
+    int hue = -1;
     int saturation = 0;
     int value_brightness = 1;
     int velocity = 0;

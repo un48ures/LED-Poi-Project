@@ -37,7 +37,7 @@ extern int filldownDone;
 /// @param message_global  contains data which picture/array should be shown
 void display(message msg, CRGB *leds)
 {
-  switch (msg.picture_hue)
+  switch (msg.picture)
   {
   case 0:
     LED_show_color(Black, msg.value_brightness, leds);
@@ -208,18 +208,13 @@ void showPicOnce(const unsigned int array[], int brightness, CRGB *leds)
 
 void PoiSonic(unsigned long time, const unsigned int array[], const int brightness, CRGB *leds)
 {
-  unsigned long currentTime = millis();
+  unsigned long startTime = millis();
 
-  // while ((millis() < currentTime + (time)) && !radio.available())
-  while ((millis() < currentTime + (time)))
+  // while ((millis() < startTime + (time)) && !radio.available())
+  while ((millis() < startTime + (time)))
   {
     showPicOnce(array, brightness, leds);
     delayMicroseconds(1000); // Abstand zwischen Bilder - may need to increase / decrease depending on spin rate
-  }
-  // if ((millis() < currentTime + (time)) && radio.available())
-  if ((millis() < currentTime + (time)))
-  {
-    Serial.println("Radio available but time not over");
   }
 }
 
@@ -429,7 +424,7 @@ void show_color(message msg, CRGB *leds)
 {
   // long tmp = msg.picture_hue * 65000;
   // printf("msg.picture_hue = %d\n", msg.picture_hue);
-  RGBColour c = hsv2rgb(msg.picture_hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+  RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
 
   for (int i = 0; i < NUM_LEDS; i++)
   {

@@ -20,7 +20,8 @@ enum HW_PINS
 typedef struct General_Message{
     int mode = 1;
     int receiver_id;
-    int picture_hue;
+    int picture;
+    int hue;
     int saturation;
     int value_brightness;
     int velocity;
