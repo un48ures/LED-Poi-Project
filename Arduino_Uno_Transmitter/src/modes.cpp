@@ -15,11 +15,12 @@ byte program = 0;     // Mode/Status Zählervariable
 byte program_old = 0; // alter Wert
 
 // mode [0-3]
-// picture/hue [0-255]
+// picture
+// hue [0-255]
 // saturation [0-255]
 // value_brightness [0-255]
 // velocity [0-255]
-byte data[5] = {0}; // data array
+byte data[6] = {0}; // data array
 
 byte array0[6][5] = {};
 
