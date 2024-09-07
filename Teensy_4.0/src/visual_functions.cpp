@@ -37,6 +37,9 @@ extern int filldownDone;
 /// @param message_global  contains data which picture/array should be shown
 void display(message msg, CRGB *leds)
 {
+  if (msg.picture != 5) filldownDone = 0;
+  if (msg.picture != 6) fillupDone = 0;
+
   switch (msg.picture)
   {
   case 0:
@@ -46,53 +49,30 @@ void display(message msg, CRGB *leds)
     LED_show_color(White, msg.value_brightness, leds);
     break;
   case 2:
-    LED_show_color(Red, msg.value_brightness, leds);
+    LED_Pulsing(msg.hue, msg.value_brightness, msg.velocity, leds);
     break;
   case 3:
-    LED_show_color(Green, msg.value_brightness, leds);
+    LED_strobo(msg.value_brightness, msg.velocity, leds);
     break;
   case 4:
-    LED_show_color(Blue, msg.value_brightness, leds);
-    break;
-  case 5:
-    LED_show_color(Purple, msg.value_brightness, leds);
-    break;
-  case 6:
-    LED_show_color(Yellow, msg.value_brightness, leds);
-    break;
-  case 7:
-    // FADE PULSE - BLUE
-    hue = 150; // BLUE
-    LED_Pulsing(hue, msg.value_brightness, msg.velocity, leds);
-    // delay(50);
-    break;
-  case 8:
-    // FADE PULSE - GREEN
-    hue = 100; // GREEN
-    LED_Pulsing(hue, msg.value_brightness, msg.velocity, leds);
-    // delay(50);
-    break;
-  case 9:
-    // FADE PULSE - RED
-    hue = 255; // GREEN
-    LED_Pulsing(hue, msg.value_brightness, msg.velocity, leds);
-    // delay(50);
-    break;
-
-  //    case 9:
-  //      FastLED.setBrightness(5);
-  //      if (filldownDone = 0) {
-  //        fill_solid(leds, NUM_LEDS, CRGB::Black);
-  //      }
-  //      LED_filldown();
-  //      break;
-  case 10:
     FastLED.setBrightness(msg.value_brightness);
     rainbow(msg.value_brightness, leds);
     break;
-  case 11:
-    LED_strobo(msg.value_brightness, msg.velocity, leds);
+  case 5: // FILL DOWN
+    FastLED.setBrightness(5);
+    if (filldownDone == 0) {
+      fill_solid(leds, NUM_LEDS, CRGB::Black);
+    }
+    LED_filldown(msg, leds);
     break;
+  case 6: // FILL UP
+    FastLED.setBrightness(5);
+    if (fillupDone == 0) {
+      fill_solid(leds, NUM_LEDS, CRGB::Black);
+    }
+    LED_fillup(msg, leds);
+    break;
+
   case 12:
     PoiSonic(DEFAULT_TIME, array1, msg.value_brightness, leds);
     break;
@@ -266,6 +246,10 @@ void LED_blink_red(CRGB* leds)
     if (LEDstate == 0)
     {
       // Let the first LED blink red
+      for (int i = 0; i < NUM_LEDS; i++)
+      {
+        leds[i] = CRGB::Black;
+      }
       leds[0] = CRGB::Red;
       FastLED.setBrightness(DEFAULT_BRIGHTNESS);
       FastLED.show();
@@ -276,7 +260,10 @@ void LED_blink_red(CRGB* leds)
     {
       if ((millis() - time_on) > LED_red_on_time)
       {
-        leds[0] = CRGB::Black;
+        for (int i = 0; i < NUM_LEDS; i++)
+        {
+          leds[i] = CRGB::Black;
+        }
         FastLED.setBrightness(DEFAULT_BRIGHTNESS);
         FastLED.show();
         LEDstate = 0;
@@ -354,14 +341,18 @@ void LED_strobo(int message_brightness, int velocity, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 // FILL FROM BOTTOM
 //-------------------------------------------------------------------------------------------------------------
-void LED_fillup(int message_brightness, CRGB *leds)
+void LED_fillup(message msg, CRGB *leds)
 {
   if (fillupDone == 0)
   {
+    RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+
     for (int i = 0; i < NUM_LEDS; i++)
     {
-      leds[i] = Red;
-      FastLED.setBrightness(message_brightness);
+      leds[i].r = c.r;
+      leds[i].g = c.g;
+      leds[i].b = c.b;
+      FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
       FastLED.delay(25);
     }
@@ -372,14 +363,18 @@ void LED_fillup(int message_brightness, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 // FILL FROM TOP
 //-------------------------------------------------------------------------------------------------------------
-void LED_filldown(int message_brightness, CRGB *leds)
+void LED_filldown(message msg, CRGB *leds)
 {
+  RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+
   if (filldownDone == 0)
   {
     for (int i = NUM_LEDS - 1; i > 0; i--)
     {
-      leds[i] = Red;
-      FastLED.setBrightness(message_brightness);
+      leds[i].r = c.r;
+      leds[i].g = c.g;
+      leds[i].b = c.b;
+      FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
       FastLED.delay(25);
     }
