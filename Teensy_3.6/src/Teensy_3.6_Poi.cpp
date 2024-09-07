@@ -80,14 +80,15 @@ void loop()
   // Data Receive
   if (radio.available())
   {
-    byte data[5] = {0};
+    byte data[6] = {0};
     radio.read(&data, sizeof(data));
     int status_register = radio.flush_rx();
     msg.mode = data[0];
-    msg.picture_hue = data[1];
-    msg.saturation = data[2];
-    msg.value_brightness = data[3];
-    msg.velocity = data[4];
+    msg.picture = data[1];
+    msg.hue = data[2];
+    msg.saturation = data[3];
+    msg.value_brightness = data[4];
+    msg.velocity = data[5];
     printf("%i\n%i\n%i\n%i\n%i\n", data[0], data[1], data[2], data[3], data[4]);
     printf("Current Millis: %i\n", millis());
     printf("Current value of status register flush_rx = %d", status_register);
@@ -109,8 +110,8 @@ void loop()
   //keep alive message
   if(millis() > old_time + 3000)
   {
-    voltage = (analogRead(A0)/1024.0) * 3.3 * 2; //3.3V Ref Voltage + 1/2 Voltage Divider
-    TeensyData = analogRead(A0);
+    voltage = (analogRead(A1)/1024.0) * 3.3 * 2; //3.3V Ref Voltage + 1/2 Voltage Divider
+    TeensyData = analogRead(A1);
     printf("\nTeensy 3.6 alive - time: %d\n", millis());
     printf("CHANNEL: %d - VOLTAGE: %f\n\n", CHANNEL, voltage);
     old_time = millis();
