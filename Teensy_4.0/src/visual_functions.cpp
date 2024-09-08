@@ -30,15 +30,17 @@ unsigned int time_on = 0; // help variable for blinking
 int saturation = 0; // saturation
 int value = 0;      // brightness value
 
-extern int fillupDone;
-extern int filldownDone;
+bool fillupDone = false;
+bool filldownDone = false;
+bool dim_up_done = false;
 
 /// @brief Make decision which array to show in relation to the received message_global
 /// @param message_global  contains data which picture/array should be shown
 void display(message msg, CRGB *leds)
 {
-  if (msg.picture != 5) filldownDone = 0;
-  if (msg.picture != 6) fillupDone = 0;
+  if (msg.picture != 5) filldownDone = false;
+  if (msg.picture != 6) fillupDone = false;
+  if (msg.picture != 7) dim_up_done = false;
 
   switch (msg.picture)
   {
@@ -72,7 +74,12 @@ void display(message msg, CRGB *leds)
     }
     LED_fillup(msg, leds);
     break;
-
+  case 7: // DIM UP
+    dim_up(msg, leds);
+    break;
+  case 8: // DIM DOWN
+    dim_down(msg, leds);
+    break;
   case 12:
     PoiSonic(DEFAULT_TIME, array1, msg.value_brightness, leds);
     break;
@@ -354,7 +361,7 @@ void LED_fillup(message msg, CRGB *leds)
       leds[i].b = c.b;
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
-      FastLED.delay(25);
+      FastLED.delay(msg.velocity);
     }
     fillupDone = 1;
   }
@@ -376,7 +383,7 @@ void LED_filldown(message msg, CRGB *leds)
       leds[i].b = c.b;
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
-      FastLED.delay(25);
+      FastLED.delay(msg.velocity);
     }
     filldownDone = 1;
   }
@@ -407,12 +414,27 @@ void rainbow(int message_brightness, CRGB *leds)
   }
 }
 
-void fadetoblack(int message_brightness, CRGB *leds)
+void dim_down(message msg, CRGB *leds)
 {
   fadeToBlackBy(leds, NUM_LEDS, 50);
-  FastLED.setBrightness(message_brightness);
+  FastLED.setBrightness(msg.value_brightness);
   FastLED.show();
-  FastLED.delay(15);
+  FastLED.delay(msg.velocity);
+}
+
+void dim_up(message msg, CRGB *leds) // need implementation
+{
+  if (dim_up_done == false)
+  {
+    show_color(msg, leds);
+    for (int i = 0; i < msg.value_brightness; i++)
+    {
+      FastLED.setBrightness(i);
+      FastLED.show();
+      FastLED.delay(msg.velocity);
+    }
+    dim_up_done = true;
+  }
 }
 
 void show_color(message msg, CRGB *leds)

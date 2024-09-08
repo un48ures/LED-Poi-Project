@@ -33,8 +33,6 @@ RF24 radio(RF24_CE, RF24_CSN);
 CRGB leds[NUM_LEDS];
 
 // Message Variables
-int fillupDone = 0;
-int filldownDone = 0;
 bool firstStart = true;
 unsigned int old_time = 0;
 float voltage = 0;
