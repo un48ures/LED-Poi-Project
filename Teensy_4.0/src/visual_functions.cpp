@@ -31,7 +31,6 @@ int saturation = 0; // saturation
 int value = 0;      // brightness value
 
 bool fillupDone = false;
-bool filldownDone = false;
 bool dim_up_done = false;
 bool picture_changed = false;
 unsigned long starttime = 0;
@@ -46,7 +45,6 @@ void display(message msg, CRGB *leds)
   if (msg.picture != old_picture)
   {
     picture_changed = true;
-    filldownDone = false;
     fillupDone = false;
     dim_up_done = false;
   }
@@ -69,19 +67,19 @@ void display(message msg, CRGB *leds)
     FastLED.setBrightness(msg.value_brightness);
     rainbow(msg.value_brightness, leds);
     break;
-  case 5: // FILL DOWN
-    FastLED.setBrightness(5);
-    if (filldownDone == 0) {
-      fill_solid(leds, NUM_LEDS, CRGB::Black);
-    }
-    LED_filldown(msg, leds);
-    break;
-  case 6: // FILL UP
+  case 5: // FILL UP
     FastLED.setBrightness(5);
     if (fillupDone == 0) {
       fill_solid(leds, NUM_LEDS, CRGB::Black);
     }
-    LED_fillup(msg, leds);
+    LED_fillup(msg, false, leds);
+    break;
+  case 6: // FILL DOWN (fill up reversed)
+    FastLED.setBrightness(5);
+    if (fillupDone == 0) {
+      fill_solid(leds, NUM_LEDS, CRGB::Black);
+    }
+    LED_fillup(msg, true, leds);
     break;
   case 7: // DIM UP
     dim_up(msg, leds);
@@ -388,9 +386,9 @@ void LED_strobo(int message_brightness, int velocity, CRGB *leds)
 }
 
 //-------------------------------------------------------------------------------------------------------------
-// FILL FROM BOTTOM
+// FILL FROM BOTTOM OR TOP (Reverse)
 //-------------------------------------------------------------------------------------------------------------
-void LED_fillup(message msg, CRGB *leds)
+void LED_fillup(message msg, bool reverse, CRGB *leds)
 {
   static int i = 0;
   if(picture_changed)
@@ -407,9 +405,19 @@ void LED_fillup(message msg, CRGB *leds)
     {
       for(int j = 0; j <= i; j++)
       {
-        leds[j].r = c.r;
-        leds[j].g = c.g;
-        leds[j].b = c.b;
+        if(!reverse)
+        {
+          leds[j].r = c.r;
+          leds[j].g = c.g;
+          leds[j].b = c.b;
+        }
+        else
+        {
+          leds[NUM_LEDS - j].r = c.r;
+          leds[NUM_LEDS - j].g = c.g;
+          leds[NUM_LEDS - j].b = c.b;
+        }
+
       }
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
@@ -419,42 +427,6 @@ void LED_fillup(message msg, CRGB *leds)
     else if ((i >= NUM_LEDS) && (millis() > (starttime + msg.velocity)))
     {
       fillupDone = 1;
-    }
-  }
-}
-
-//-------------------------------------------------------------------------------------------------------------
-// FILL FROM TOP
-//-------------------------------------------------------------------------------------------------------------
-void LED_filldown(message msg, CRGB *leds)
-{
-static int i = 0;
-  if(picture_changed)
-  {
-    starttime = millis();
-    i = 0;
-  }
-
-  if (filldownDone == 0)
-  {
-    RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
-
-    if ((i <= NUM_LEDS) && (millis() >= (starttime + msg.velocity)))
-    {
-      for(int j = 0; j <= i; j++)
-      {
-        leds[NUM_LEDS - j].r = c.r;
-        leds[NUM_LEDS - j].g = c.g;
-        leds[NUM_LEDS - j].b = c.b;
-      }
-      FastLED.setBrightness(msg.value_brightness);
-      FastLED.show();
-      starttime = millis();
-      i++;
-    }
-    else if ((i >= NUM_LEDS) && (millis() > (starttime + msg.velocity)))
-    {
-      filldownDone = 1;
     }
   }
 }
