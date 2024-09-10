@@ -392,20 +392,34 @@ void LED_strobo(int message_brightness, int velocity, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 void LED_fillup(message msg, CRGB *leds)
 {
+  static int i = 0;
+  if(picture_changed)
+  {
+    starttime = millis();
+    i = 0;
+  }
+
   if (fillupDone == 0)
   {
     RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
 
-    for (int i = 0; i < NUM_LEDS; i++)
+    if ((i <= NUM_LEDS) && (millis() >= (starttime + msg.velocity)))
     {
-      leds[i].r = c.r;
-      leds[i].g = c.g;
-      leds[i].b = c.b;
+      for(int j = 0; j <= i; j++)
+      {
+        leds[j].r = c.r;
+        leds[j].g = c.g;
+        leds[j].b = c.b;
+      }
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
-      FastLED.delay(msg.velocity);
+      starttime = millis();
+      i++;
     }
-    fillupDone = 1;
+    else if ((i >= NUM_LEDS) && (millis() > (starttime + msg.velocity)))
+    {
+      fillupDone = 1;
+    }
   }
 }
 
@@ -414,20 +428,34 @@ void LED_fillup(message msg, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 void LED_filldown(message msg, CRGB *leds)
 {
-  RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+static int i = 0;
+  if(picture_changed)
+  {
+    starttime = millis();
+    i = 0;
+  }
 
   if (filldownDone == 0)
   {
-    for (int i = NUM_LEDS - 1; i > 0; i--)
+    RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+
+    if ((i <= NUM_LEDS) && (millis() >= (starttime + msg.velocity)))
     {
-      leds[i].r = c.r;
-      leds[i].g = c.g;
-      leds[i].b = c.b;
+      for(int j = 0; j <= i; j++)
+      {
+        leds[NUM_LEDS - j].r = c.r;
+        leds[NUM_LEDS - j].g = c.g;
+        leds[NUM_LEDS - j].b = c.b;
+      }
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
-      FastLED.delay(msg.velocity);
+      starttime = millis();
+      i++;
     }
-    filldownDone = 1;
+    else if ((i >= NUM_LEDS) && (millis() > (starttime + msg.velocity)))
+    {
+      filldownDone = 1;
+    }
   }
 }
 
