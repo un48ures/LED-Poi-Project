@@ -33,14 +33,22 @@ int value = 0;      // brightness value
 bool fillupDone = false;
 bool filldownDone = false;
 bool dim_up_done = false;
+bool picture_changed = false;
 
 /// @brief Make decision which array to show in relation to the received message_global
 /// @param message_global  contains data which picture/array should be shown
 void display(message msg, CRGB *leds)
 {
-  if (msg.picture != 5) filldownDone = false;
-  if (msg.picture != 6) fillupDone = false;
-  if (msg.picture != 7) dim_up_done = false;
+  static int old_picture = 0;
+  picture_changed = false;
+
+  if (msg.picture != old_picture)
+  {
+    picture_changed = true;
+    filldownDone = false;
+    fillupDone = false;
+    dim_up_done = false;
+  }
 
   switch (msg.picture)
   {
@@ -148,6 +156,7 @@ void display(message msg, CRGB *leds)
     LED_blink_red(leds);
     break;
   }
+  old_picture = msg.picture;
 }
 
 /// @brief Function to go through the picture arrays and show each slice via FastLED
@@ -296,41 +305,56 @@ void LED_show_color(HTMLColorCode color, int message_brightness, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB *leds)
 {
+  static unsigned long starttime = 0;
+  if (picture_changed)
+  {
+    starttime = millis();
+    looping = 0;
+  }
+
   int b_target = message_brightness;
   if (message_brightness < 10)
   {
     b_target = 10;
   }
-  // aufsteigend
+  // Aufsteigend
   if (looping == 0)
   {
-    for (int j = 0; j < (velocity / 2); j++)
+    //for (int j = 0; j < (velocity / 2); j++)
+    if(millis() < (starttime + velocity * 40))
     {
-      //    if (radio.available()) {last_one = 1;}
       for (int i = 0; i < NUM_LEDS; i++)
       {
         leds[i].setHSV(hue, 255, 255);
-        FastLED.setBrightness((uint8_t) (j / (float) velocity / 2.0 * (float) b_target));
+        FastLED.setBrightness((uint8_t) ((millis() - starttime) / (velocity * 40.0) * (float) b_target));
         FastLED.show();
       }
     }
-    looping = 1; // jetzt absteigend
+    else
+    {
+      looping = 1; // jetzt absteigend
+      starttime = millis();
+    }
   }
 
   // absteigend
   if (looping == 1)
   {
-    for (int j = (velocity / 2); j > 0; j--)
+    if(millis() < (starttime + velocity * 40))
     {
       for (int i = 0; i < NUM_LEDS; i++)
       {
         leds[i].setHSV(hue, 255, 255);
-        FastLED.setBrightness((uint8_t) (j / (float) velocity / 2.0 * (float) b_target));
+        FastLED.setBrightness((uint8_t) ((starttime + velocity * 40.0 - millis()) / (velocity * 40.0) * (float) b_target));
         FastLED.show();
       }
     }
-    looping = 0;
-    LED_show_color(Black, 0, leds);
+    else
+    {
+      looping = 0;
+      starttime = millis();
+    }
+    // LED_show_color(Black, 0, leds);
   }
 }
 
