@@ -34,6 +34,7 @@ bool fillupDone = false;
 bool filldownDone = false;
 bool dim_up_done = false;
 bool picture_changed = false;
+unsigned long starttime = 0;
 
 /// @brief Make decision which array to show in relation to the received message_global
 /// @param message_global  contains data which picture/array should be shown
@@ -305,7 +306,6 @@ void LED_show_color(HTMLColorCode color, int message_brightness, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB *leds)
 {
-  static unsigned long starttime = 0;
   if (picture_changed)
   {
     starttime = millis();
@@ -320,7 +320,6 @@ void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB *leds)
   // Aufsteigend
   if (looping == 0)
   {
-    //for (int j = 0; j < (velocity / 2); j++)
     if(millis() < (starttime + velocity * 40))
     {
       for (int i = 0; i < NUM_LEDS; i++)
@@ -337,7 +336,7 @@ void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB *leds)
     }
   }
 
-  // absteigend
+  // Absteigend
   if (looping == 1)
   {
     if(millis() < (starttime + velocity * 40))
@@ -354,7 +353,6 @@ void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB *leds)
       looping = 0;
       starttime = millis();
     }
-    // LED_show_color(Black, 0, leds);
   }
 }
 
@@ -363,10 +361,30 @@ void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB *leds)
 //-------------------------------------------------------------------------------------------------------------
 void LED_strobo(int message_brightness, int velocity, CRGB *leds)
 {
-  LED_show_color(White, message_brightness, leds);
-  delay(velocity);
-  LED_show_color(Black, message_brightness, leds);
-  delay(velocity);
+  if(picture_changed)
+  {
+    starttime = millis();
+  }
+  
+  if(millis() < (starttime + velocity))
+  {
+    LED_show_color(White, message_brightness, leds);
+  }
+  else
+  {
+    if(millis() < (starttime + 2 * velocity))
+    {
+      LED_show_color(Black, message_brightness, leds);
+    }
+    else
+    {
+      starttime = millis();
+    }
+  }
+  
+  //delay(velocity);
+  
+  // delay(velocity);
 }
 
 //-------------------------------------------------------------------------------------------------------------
