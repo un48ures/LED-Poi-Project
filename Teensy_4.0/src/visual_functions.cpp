@@ -68,17 +68,9 @@ void display(message msg, CRGB *leds)
     rainbow(msg.value_brightness, leds);
     break;
   case 5: // FILL UP
-    FastLED.setBrightness(5);
-    if (fillupDone == 0) {
-      fill_solid(leds, NUM_LEDS, CRGB::Black);
-    }
     LED_fillup(msg, false, leds);
     break;
   case 6: // FILL DOWN (fill up reversed)
-    FastLED.setBrightness(5);
-    if (fillupDone == 0) {
-      fill_solid(leds, NUM_LEDS, CRGB::Black);
-    }
     LED_fillup(msg, true, leds);
     break;
   case 7: // DIM UP
@@ -86,6 +78,12 @@ void display(message msg, CRGB *leds)
     break;
   case 8: // DIM DOWN
     dim_down(msg, leds);
+    break;
+  case 9: // RUN UP
+    LED_runner(msg, false, leds);
+    break;
+  case 10: // RUN DOWN
+    LED_runner(msg, true, leds);
     break;
   case 12:
     PoiSonic(DEFAULT_TIME, array1, msg.value_brightness, leds);
@@ -395,6 +393,7 @@ void LED_fillup(message msg, bool reverse, CRGB *leds)
   {
     starttime = millis();
     i = 0;
+    fill_solid(leds, NUM_LEDS, CRGB::Black);
   }
 
   if (fillupDone == 0)
@@ -403,21 +402,17 @@ void LED_fillup(message msg, bool reverse, CRGB *leds)
 
     if ((i <= NUM_LEDS) && (millis() >= (starttime + msg.velocity)))
     {
-      for(int j = 0; j <= i; j++)
+      if(!reverse)
       {
-        if(!reverse)
-        {
-          leds[j].r = c.r;
-          leds[j].g = c.g;
-          leds[j].b = c.b;
-        }
-        else
-        {
-          leds[NUM_LEDS - j].r = c.r;
-          leds[NUM_LEDS - j].g = c.g;
-          leds[NUM_LEDS - j].b = c.b;
-        }
-
+        leds[i].r = c.r;
+        leds[i].g = c.g;
+        leds[i].b = c.b;
+      }
+      else
+      {
+        leds[NUM_LEDS - i].r = c.r;
+        leds[NUM_LEDS - i].g = c.g;
+        leds[NUM_LEDS - i].b = c.b;
       }
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
@@ -427,6 +422,8 @@ void LED_fillup(message msg, bool reverse, CRGB *leds)
     else if ((i >= NUM_LEDS) && (millis() > (starttime + msg.velocity)))
     {
       fillupDone = 1;
+      fill_solid(leds, NUM_LEDS, CRGB::Black);
+      FastLED.show();
     }
   }
 }
@@ -500,6 +497,15 @@ void dim_up(message msg, CRGB *leds) // need implementation
       dim_up_done = true;
     }
   }
+}
+
+//-------------------------------------------------------------------------------------------------------------
+// RUN LIGHT POINT FROM BOTTOM TO TOP (or reverse)
+//-------------------------------------------------------------------------------------------------------------
+void LED_runner(message msg, bool reverse, CRGB *leds)
+{
+  fill_solid(leds, NUM_LEDS, CRGB::Black);
+  LED_fillup(msg, reverse, leds);
 }
 
 void show_color(message msg, CRGB *leds)

@@ -23,7 +23,7 @@ void LED_blink_red(CRGB* leds);
 void LED_show_color(HTMLColorCode color, int brightness, CRGB* leds);
 void LED_strobo(int message_brightness, int velocity, CRGB* leds);
 void LED_fillup(message msg, bool reverse, CRGB* leds);
-void LED_filldown(message msg, CRGB* leds);
+void LED_runner(message msg, bool reverse, CRGB* leds);
 void addGlitter(char chanceOfGlitter, CRGB* leds);
 void rainbow(int message_brightness, CRGB* leds);
 void dim_up(message msg, CRGB* leds);
