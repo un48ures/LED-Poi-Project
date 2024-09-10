@@ -458,24 +458,47 @@ void rainbow(int message_brightness, CRGB *leds)
 
 void dim_down(message msg, CRGB *leds)
 {
-  fadeToBlackBy(leds, NUM_LEDS, 50);
-  FastLED.setBrightness(msg.value_brightness);
-  FastLED.show();
-  FastLED.delay(msg.velocity);
+  if(picture_changed)
+  {
+    starttime = millis();
+  }
+  if (millis() >= (starttime + msg.velocity))
+  {
+    fadeToBlackBy(leds, NUM_LEDS, 50);
+    FastLED.setBrightness(msg.value_brightness);
+    FastLED.show();
+    starttime = millis();
+  }
 }
 
 void dim_up(message msg, CRGB *leds) // need implementation
 {
+  static int i = 0;
+  if(picture_changed)
+  {
+    starttime = millis();
+    i = 0;
+    RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
+    for(int j = 0; j <= NUM_LEDS; j++)
+    {
+      leds[j].r = c.r;
+      leds[j].g = c.g;
+      leds[j].b = c.b;
+    }
+  }
   if (dim_up_done == false)
   {
-    show_color(msg, leds);
-    for (int i = 0; i < msg.value_brightness; i++)
+    if((millis() > (starttime + msg.velocity)))
     {
       FastLED.setBrightness(i);
       FastLED.show();
-      FastLED.delay(msg.velocity);
+      i++;
+      starttime = millis();
     }
-    dim_up_done = true;
+    if(i >= msg.value_brightness)
+    {
+      dim_up_done = true;
+    }
   }
 }
 
