@@ -51,49 +51,61 @@ void display(message msg, CRGB *leds)
 
   switch (msg.picture)
   {
-  case 0:
+  case 0: // BLACK
     LED_show_color(Black, msg.value_brightness, leds);
     break;
-  case 1:
+  case 1: // WHITE
     LED_show_color(White, msg.value_brightness, leds);
     break;
-  case 2:
+  case 2: // PULSE
     LED_Pulsing(msg.hue, msg.value_brightness, msg.velocity, leds);
     break;
-  case 3:
+  case 3: // STROBO
     LED_strobo(msg.value_brightness, msg.velocity, leds);
     break;
-  case 4:
+  case 4: // RAINBOW
     FastLED.setBrightness(msg.value_brightness);
-    rainbow(msg.value_brightness, leds);
+    rainbow(msg, leds);
     break;
-  case 5: // FILL UP
+  case 5: // confetti
+    confetti(msg, leds);
+    break;
+  case 6: // sinelon
+    sinelon(msg, leds);
+    break;
+  case 7: // bpm
+    bpm(msg, leds);
+    break;
+  case 8: // juggle
+    juggle(msg, leds);
+    break;
+  case 9: // FILL UP
     LED_fillup(msg, false, leds);
     break;
-  case 6: // FILL DOWN (fill up reversed)
+  case 10: // FILL DOWN (fill up reversed)
     LED_fillup(msg, true, leds);
     break;
-  case 7: // DIM UP
+  case 11: // DIM UP
     dim_up(msg, leds);
     break;
-  case 8: // DIM DOWN
+  case 12: // DIM DOWN
     dim_down(msg, leds);
     break;
-  case 9: // RUN UP
+  case 13: // RUN UP
     LED_runner(msg, false, leds);
     break;
-  case 10: // RUN DOWN
+  case 14: // RUN DOWN
     LED_runner(msg, true, leds);
     break;
-  case 12:
-    PoiSonic(DEFAULT_TIME, array1, msg.value_brightness, leds);
-    break;
-  case 13:
-    PoiSonic(DEFAULT_TIME, array2, msg.value_brightness, leds);
-    break;
-  case 14:
-    PoiSonic(DEFAULT_TIME, array3, msg.value_brightness, leds);
-    break;
+  // case 12:
+  //   PoiSonic(DEFAULT_TIME, array1, msg.value_brightness, leds);
+  //   break;
+  // case 13:
+  //   PoiSonic(DEFAULT_TIME, array2, msg.value_brightness, leds);
+  //   break;
+  // case 14:
+  //   PoiSonic(DEFAULT_TIME, array3, msg.value_brightness, leds);
+  //   break;
   case 15:
     PoiSonic(DEFAULT_TIME, array4, msg.value_brightness, leds);
     break;
@@ -396,7 +408,7 @@ void LED_fillup(message msg, bool reverse, CRGB *leds)
     fill_solid(leds, NUM_LEDS, CRGB::Black);
   }
 
-  if (fillupDone == 0)
+  if (fillupDone == false)
   {
     RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
 
@@ -410,9 +422,9 @@ void LED_fillup(message msg, bool reverse, CRGB *leds)
       }
       else
       {
-        leds[NUM_LEDS - i].r = c.r;
-        leds[NUM_LEDS - i].g = c.g;
-        leds[NUM_LEDS - i].b = c.b;
+        leds[NUM_LEDS - i - 1].r = c.r;
+        leds[NUM_LEDS - i - 1].g = c.g;
+        leds[NUM_LEDS - i - 1].b = c.b;
       }
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
@@ -421,9 +433,7 @@ void LED_fillup(message msg, bool reverse, CRGB *leds)
     }
     else if ((i >= NUM_LEDS) && (millis() > (starttime + msg.velocity)))
     {
-      fillupDone = 1;
-      fill_solid(leds, NUM_LEDS, CRGB::Black);
-      FastLED.show();
+      fillupDone = true;
     }
   }
 }
@@ -439,18 +449,63 @@ void addGlitter(char chanceOfGlitter, CRGB* leds)
   }
 }
 
-void rainbow(int message_brightness, CRGB *leds)
+void rainbow(message msg, CRGB *leds)
 {
   // FastLED's built-in rainbow generator
   fill_rainbow(leds, NUM_LEDS, gHue, 7);
   addGlitter(80, leds);
-  FastLED.setBrightness(message_brightness);
+  FastLED.setBrightness(msg.value_brightness);
   FastLED.show();
   // FastLED.delay(50); !!!!
-  EVERY_N_MILLISECONDS(10)
+  EVERY_N_MILLISECONDS(msg.velocity)
   {
     gHue++;
   }
+}
+
+void confetti(message msg, CRGB *leds) 
+{
+  // random colored speckles that blink in and fade smoothly
+  fadeToBlackBy( leds, NUM_LEDS, 10);
+  int pos = random16(NUM_LEDS);
+  leds[pos] += CHSV( gHue + random8(64), 200, 255);
+  FastLED.setBrightness(msg.value_brightness);
+  FastLED.show();
+}
+
+void sinelon(message msg, CRGB *leds)
+{
+  // a colored dot sweeping back and forth, with fading trails
+  fadeToBlackBy( leds, NUM_LEDS, 20);
+  int pos = beatsin16( msg.velocity, 0, NUM_LEDS-1 );
+  leds[pos] += CHSV( gHue, 255, 192);
+  FastLED.setBrightness(msg.value_brightness);
+  FastLED.show();
+}
+
+void bpm(message msg, CRGB *leds)
+{
+  // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+  uint8_t BeatsPerMinute = 62;
+  CRGBPalette16 palette = PartyColors_p;
+  uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
+  for( int i = 0; i < NUM_LEDS; i++) { //9948
+    leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
+  }
+  FastLED.setBrightness(msg.value_brightness);
+  FastLED.show();
+}
+
+void juggle(message msg, CRGB *leds) {
+  // eight colored dots, weaving in and out of sync with each other
+  fadeToBlackBy( leds, NUM_LEDS, 20);
+  byte dothue = 0;
+  for( int i = 0; i < 8; i++) {
+    leds[beatsin16( i+7, 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
+    dothue += 32;
+  }
+  FastLED.setBrightness(msg.value_brightness);
+  FastLED.show();
 }
 
 void dim_down(message msg, CRGB *leds)
