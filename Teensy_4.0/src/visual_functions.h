@@ -16,8 +16,7 @@ typedef struct RGBColour {
 
 void display(message msg, CRGB* leds);
 void PoiSonic_old(unsigned long time, const unsigned int array[], int brightness, CRGB* leds);
-void showPicOnce(const unsigned int array[], int brightness, CRGB* leds);
-void PoiSonic(unsigned long time, const unsigned int array[], int brightness, CRGB* leds);
+void showPicOnce(const unsigned int array[], message msg, CRGB* leds);
 void StartDemo(int message_brightness, CRGB* leds);
 void LED_blink_red(CRGB* leds);
 void LED_show_color(HTMLColorCode color, int brightness, CRGB* leds);

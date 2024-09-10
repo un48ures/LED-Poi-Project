@@ -97,69 +97,69 @@ void display(message msg, CRGB *leds)
   case 14: // RUN DOWN
     LED_runner(msg, true, leds);
     break;
-  // case 12:
-  //   PoiSonic(DEFAULT_TIME, array1, msg.value_brightness, leds);
-  //   break;
-  // case 13:
-  //   PoiSonic(DEFAULT_TIME, array2, msg.value_brightness, leds);
-  //   break;
-  // case 14:
-  //   PoiSonic(DEFAULT_TIME, array3, msg.value_brightness, leds);
-  //   break;
   case 15:
-    PoiSonic(DEFAULT_TIME, array4, msg.value_brightness, leds);
+    showPicOnce(array1, msg, leds);
     break;
   case 16:
-    PoiSonic(DEFAULT_TIME, array5, msg.value_brightness, leds);
+    showPicOnce(array2, msg, leds);
     break;
   case 17:
-    PoiSonic(DEFAULT_TIME, array6, msg.value_brightness, leds);
+    showPicOnce(array3, msg, leds);
     break;
   case 18:
-    PoiSonic(DEFAULT_TIME, array7, msg.value_brightness, leds);
+    showPicOnce(array4, msg, leds);
     break;
   case 19:
-    PoiSonic(DEFAULT_TIME, array8, msg.value_brightness, leds);
+    showPicOnce(array5, msg, leds);
     break;
   case 20:
-    PoiSonic(DEFAULT_TIME, array9, msg.value_brightness, leds);
+    showPicOnce(array6, msg, leds);
     break;
   case 21:
-    PoiSonic(DEFAULT_TIME, array10, msg.value_brightness, leds);
+    showPicOnce(array7, msg, leds);
     break;
   case 22:
-    PoiSonic(DEFAULT_TIME, array11, msg.value_brightness, leds);
+    showPicOnce(array8, msg, leds);
     break;
   case 23:
-    PoiSonic(DEFAULT_TIME, array12, msg.value_brightness, leds);
+    showPicOnce(array9, msg, leds);
     break;
   case 24:
-    PoiSonic(DEFAULT_TIME, array13, msg.value_brightness, leds);
+    showPicOnce(array10, msg, leds);
     break;
   case 25:
-    PoiSonic(DEFAULT_TIME, array14, msg.value_brightness, leds);
+    showPicOnce(array11, msg, leds);
     break;
   case 26:
-    PoiSonic(DEFAULT_TIME, array15, msg.value_brightness, leds);
+    showPicOnce(array12, msg, leds);
     break;
   case 27:
-    PoiSonic(DEFAULT_TIME, array16, msg.value_brightness, leds);
+    showPicOnce(array13, msg, leds);
     break;
   case 28:
-    PoiSonic(DEFAULT_TIME, array17, msg.value_brightness, leds);
+    showPicOnce(array14, msg, leds);
     break;
   case 29:
-    PoiSonic(DEFAULT_TIME, array18, msg.value_brightness, leds);
-    break;
-  case 30:
-    PoiSonic(DEFAULT_TIME, array19, msg.value_brightness, leds);
-    break;
-  case 31:
-    PoiSonic(DEFAULT_TIME, array20, msg.value_brightness, leds);
-    break;
-  case 32:
-    PoiSonic(DEFAULT_TIME, array21, msg.value_brightness, leds);
-    break;
+    showPicOnce(array15, msg, leds);
+  //   break;
+  // case 30:
+  //   showPicOnce(array16, msg, leds);
+  //   break;
+  // case 31:
+  //   showPicOnce(array17, msg, leds);
+  //   break;
+  // case 32:
+  //   showPicOnce(array18, msg, leds);
+  //   break;
+  // case 33:
+  //   showPicOnce(array19, msg, leds);
+  //   break;
+  // case 34:
+  //   showPicOnce(array20, msg, leds);
+  //   break;
+  // case 35:
+  //   showPicOnce(array21, msg, leds);
+  //   break;
 
   default:
     LED_blink_red(leds);
@@ -195,7 +195,7 @@ void PoiSonic_old(unsigned long time, const unsigned int array[], int brightness
   }
 }
 
-void showPicOnce(const unsigned int array[], int brightness, CRGB *leds)
+void showPicOnce(const unsigned int array[], message msg, CRGB *leds)
 {
   for (int x = 0; x < NUM_SLICES; x++)
   {
@@ -203,23 +203,11 @@ void showPicOnce(const unsigned int array[], int brightness, CRGB *leds)
     {
       leds[z - 1] = array[x + ((NUM_LEDS - z) * NUM_SLICES)];
     }
-    FastLED.setBrightness(brightness);
+    FastLED.setBrightness(msg.value_brightness);
     FastLED.show();
     // Serial.println("FASTLED show...");
     // if (radio.available()) return;
-    delayMicroseconds(500); // Pause between slices - may need to increase / decrease depending on spin rate original value = 40
-  }
-}
-
-void PoiSonic(unsigned long time, const unsigned int array[], const int brightness, CRGB *leds)
-{
-  unsigned long startTime = millis();
-
-  // while ((millis() < startTime + (time)) && !radio.available())
-  while ((millis() < startTime + (time)))
-  {
-    showPicOnce(array, brightness, leds);
-    delayMicroseconds(1000); // Abstand zwischen Bilder - may need to increase / decrease depending on spin rate
+    delayMicroseconds(msg.velocity * 20); // Pause between slices - may need to increase / decrease depending on spin rate original value = 40
   }
 }
 
