@@ -35,6 +35,14 @@ bool dim_up_done = false;
 bool picture_changed = false;
 unsigned long starttime = 0;
 
+const unsigned int *pic_array[31] = {array1, array2, array3, array4, array5, array6, array7, array8, array9, array10, array11, array12, array13, array14, 
+                                    array15, array16, array17, array18, array19, array20, array21, array22, array23, array24, array25, array26, array27, array28, 
+                                    array29, array30, array31};
+int pic_array_length[31] = {sizeof(array1), sizeof(array2), sizeof(array3), sizeof(array4), sizeof(array5), sizeof(array6), sizeof(array7), sizeof(array8), 
+                              sizeof(array9), sizeof(array10), sizeof(array11), sizeof(array12), sizeof(array13), sizeof(array14), sizeof(array15), sizeof(array16), 
+                              sizeof(array17), sizeof(array18), sizeof(array19), sizeof(array20), sizeof(array21), sizeof(array22), sizeof(array23), sizeof(array24), 
+                              sizeof(array25), sizeof(array26), sizeof(array27), sizeof(array28), sizeof(array29), sizeof(array30), sizeof(array31)};
+
 /// @brief Make decision which array to show in relation to the received message_global
 /// @param message_global  contains data which picture/array should be shown
 void display(message msg, CRGB *leds)
@@ -48,14 +56,6 @@ void display(message msg, CRGB *leds)
     fillupDone = false;
     dim_up_done = false;
   }
-
-  const unsigned int *pic_array[31] = {array1, array2, array3, array4, array5, array6, array7, array8, array9, array10, array11, array12, array13, array14, 
-                                      array15, array16, array17, array18, array19, array20, array21, array22, array23, array24, array25, array26, array27, array28, 
-                                      array29, array30, array31};
-  int pic_array_length[31] = {sizeof(array1), sizeof(array2), sizeof(array3), sizeof(array4), sizeof(array5), sizeof(array6), sizeof(array7), sizeof(array8), 
-                              sizeof(array9), sizeof(array10), sizeof(array11), sizeof(array12), sizeof(array13), sizeof(array14), sizeof(array15), sizeof(array16), 
-                              sizeof(array17), sizeof(array18), sizeof(array19), sizeof(array20), sizeof(array21), sizeof(array22), sizeof(array23), sizeof(array24), 
-                              sizeof(array25), sizeof(array26), sizeof(array27), sizeof(array28), sizeof(array29), sizeof(array30), sizeof(array31)};
 
   if ((msg.picture >= 15) && (((unsigned int)msg.picture - 14) <= (sizeof(pic_array_length) / sizeof(int))))
   {
@@ -166,9 +166,14 @@ void StartDemo(int message_brightness, CRGB *leds)
 // Standby 1st LED Blink RED
 void LED_blink_red(CRGB* leds)
 {
+  if(picture_changed)
+  {
+    LED_show_color(Black, DEFAULT_BRIGHTNESS, leds);
+  }
+
   unsigned long currentMillis = millis(); // for LED blink
 
-  if (currentMillis - previousMillis >= interval_1)
+  if ((currentMillis - previousMillis) >= interval_1)
   {
     // save the last time you blinked the LED
     previousMillis = currentMillis;
@@ -181,10 +186,7 @@ void LED_blink_red(CRGB* leds)
     if (LEDstate == 0)
     {
       // Let the first LED blink red
-      for (int i = 0; i < NUM_LEDS; i++)
-      {
-        leds[i] = CRGB::Black;
-      }
+      fill_solid(leds, NUM_LEDS, CRGB::Black);
       leds[0] = CRGB::Red;
       FastLED.setBrightness(DEFAULT_BRIGHTNESS);
       FastLED.show();
@@ -195,10 +197,7 @@ void LED_blink_red(CRGB* leds)
     {
       if ((millis() - time_on) > LED_red_on_time)
       {
-        for (int i = 0; i < NUM_LEDS; i++)
-        {
-          leds[i] = CRGB::Black;
-        }
+        fill_solid(leds, NUM_LEDS, CRGB::Black);
         FastLED.setBrightness(DEFAULT_BRIGHTNESS);
         FastLED.show();
         LEDstate = 0;
@@ -438,6 +437,7 @@ void dim_up(message msg, CRGB *leds) // need implementation
   static int i = 0;
   if(picture_changed)
   {
+    // printf("Picture changed - begin dim_up\n");
     starttime = millis();
     i = 0;
     RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
@@ -450,16 +450,19 @@ void dim_up(message msg, CRGB *leds) // need implementation
   }
   if (dim_up_done == false)
   {
+    // printf("dim_up_done == false\n");
     if((millis() > (starttime + msg.velocity)))
     {
       FastLED.setBrightness(i);
       FastLED.show();
       i++;
       starttime = millis();
+      // printf("i = %d and new starttime = %d\n", i, starttime);
     }
     if(i >= msg.value_brightness)
     {
       dim_up_done = true;
+      //printf("Dim up done!\n");
     }
   }
 }
