@@ -11,3 +11,9 @@ made the viewer see real colored images because of the persistence of vision (po
 
 So I wanted to take it a step further and make a music synchronized controller which controls multiple Pois (6 at this point).
 Therefore nRF24L01 2.4Ghz Transceiver moduls were used.
+
+## Teensy 3.6 - Wiring
+![image](https://github.com/user-attachments/assets/d5cb2b31-7629-4b29-bba9-347b3d013a23)
+
+## Teensy 4.0 - Wiring
+![image](https://github.com/user-attachments/assets/423ae56b-6234-4ae1-b0d4-ef39c1e420d2)
