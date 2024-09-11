@@ -49,6 +49,19 @@ void display(message msg, CRGB *leds)
     dim_up_done = false;
   }
 
+  const unsigned int *pic_array[31] = {array1, array2, array3, array4, array5, array6, array7, array8, array9, array10, array11, array12, array13, array14, 
+                                      array15, array16, array17, array18, array19, array20, array21, array22, array23, array24, array25, array26, array27, array28, 
+                                      array29, array30, array31};
+  int pic_array_length[31] = {sizeof(array1), sizeof(array2), sizeof(array3), sizeof(array4), sizeof(array5), sizeof(array6), sizeof(array7), sizeof(array8), 
+                              sizeof(array9), sizeof(array10), sizeof(array11), sizeof(array12), sizeof(array13), sizeof(array14), sizeof(array15), sizeof(array16), 
+                              sizeof(array17), sizeof(array18), sizeof(array19), sizeof(array20), sizeof(array21), sizeof(array22), sizeof(array23), sizeof(array24), 
+                              sizeof(array25), sizeof(array26), sizeof(array27), sizeof(array28), sizeof(array29), sizeof(array30), sizeof(array31)};
+
+  if ((msg.picture >= 15) && (((unsigned int)msg.picture - 14) <= (sizeof(pic_array_length) / sizeof(int))))
+  {
+    showPicOnce(pic_array[msg.picture - 15], pic_array_length[msg.picture - 15], msg, leds);
+  }
+
   switch (msg.picture)
   {
   case 0: // BLACK
@@ -97,69 +110,6 @@ void display(message msg, CRGB *leds)
   case 14: // RUN DOWN
     LED_runner(msg, true, leds);
     break;
-  case 15:
-    showPicOnce(array1, msg, leds);
-    break;
-  case 16:
-    showPicOnce(array2, msg, leds);
-    break;
-  case 17:
-    showPicOnce(array3, msg, leds);
-    break;
-  case 18:
-    showPicOnce(array4, msg, leds);
-    break;
-  case 19:
-    showPicOnce(array5, msg, leds);
-    break;
-  case 20:
-    showPicOnce(array6, msg, leds);
-    break;
-  case 21:
-    showPicOnce(array7, msg, leds);
-    break;
-  case 22:
-    showPicOnce(array8, msg, leds);
-    break;
-  case 23:
-    showPicOnce(array9, msg, leds);
-    break;
-  case 24:
-    showPicOnce(array10, msg, leds);
-    break;
-  case 25:
-    showPicOnce(array11, msg, leds);
-    break;
-  case 26:
-    showPicOnce(array12, msg, leds);
-    break;
-  case 27:
-    showPicOnce(array13, msg, leds);
-    break;
-  case 28:
-    showPicOnce(array14, msg, leds);
-    break;
-  case 29:
-    showPicOnce(array15, msg, leds);
-  //   break;
-  // case 30:
-  //   showPicOnce(array16, msg, leds);
-  //   break;
-  // case 31:
-  //   showPicOnce(array17, msg, leds);
-  //   break;
-  // case 32:
-  //   showPicOnce(array18, msg, leds);
-  //   break;
-  // case 33:
-  //   showPicOnce(array19, msg, leds);
-  //   break;
-  // case 34:
-  //   showPicOnce(array20, msg, leds);
-  //   break;
-  // case 35:
-  //   showPicOnce(array21, msg, leds);
-  //   break;
 
   default:
     LED_blink_red(leds);
@@ -168,46 +118,18 @@ void display(message msg, CRGB *leds)
   old_picture = msg.picture;
 }
 
-/// @brief Function to go through the picture arrays and show each slice via FastLED
-/// @param time Time a picture is shown (repeated while time is not over)
-/// @param array Array (picture) to be shown via FastLED
-void PoiSonic_old(unsigned long time, const unsigned int array[], int brightness, CRGB *leds)
+void showPicOnce(const unsigned int array[], int array_length, message msg, CRGB *leds)
 {
-  unsigned long currentTime = millis();
-
-  while (millis() < currentTime + (time))
-  {
-    int f = NUM_SLICES;
-    int z; // a counter
-    int j = NUM_LEDS;
-    for (int x = 0; x < f; x++)
-    {
-      for (z = NUM_LEDS; z > 0; z--)
-      {
-        leds[z - 1] = array[x + ((j - z) * f)];
-      }
-      // LED_setBrightness(message_brightness);
-      // FastLED.show();
-      // Serial.println("FASTLED show...");
-      delayMicroseconds(500); // may need to increase / decrease depending on spin rate original value = 40
-    }
-    delayMicroseconds(1000); // Abstand zwischen Bilder - may need to increase / decrease depending on spin rate
-  }
-}
-
-void showPicOnce(const unsigned int array[], message msg, CRGB *leds)
-{
-  for (int x = 0; x < NUM_SLICES; x++)
+  int num_slices = array_length / 61 / 4; // 4 Byte per pixel
+  for (int x = 0; x < num_slices; x++)
   {
     for (int z = NUM_LEDS; z > 0; z--)
     {
-      leds[z - 1] = array[x + ((NUM_LEDS - z) * NUM_SLICES)];
+      leds[z - 1] = array[x + ((NUM_LEDS - z) * num_slices)];
     }
     FastLED.setBrightness(msg.value_brightness);
     FastLED.show();
-    // Serial.println("FASTLED show...");
-    // if (radio.available()) return;
-    delayMicroseconds(msg.velocity * 20); // Pause between slices - may need to increase / decrease depending on spin rate original value = 40
+    delayMicroseconds(msg.velocity * 25); // Pause between slices - may need to increase / decrease depending on spin rate original value = 40
   }
 }
 

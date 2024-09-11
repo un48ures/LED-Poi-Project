@@ -111,21 +111,6 @@ void loop()
     voltage = (analogRead(A1)/1024.0) * 3.3 * 2; //3.3V Ref Voltage + 1/2 Voltage Divider
     TeensyData = analogRead(A1);
     printf("\nTeensy 3.6 alive - time: %d\n", millis());
-    // printf("Array 1 length : %i and size:%i\n", sizeof(array1)/sizeof(array1[0]), sizeof(array1));
-    // printf("Array 2 length : %i and size:%i\n", sizeof(array2)/sizeof(array2[0]), sizeof(array2));
-    // printf("Array 3 length : %i and size:%i\n", sizeof(array3)/sizeof(array3[0]), sizeof(array3));
-    // printf("Array 4 length : %i and size:%i\n", sizeof(array4)/sizeof(array4[0]), sizeof(array4));
-    // printf("Array 5 length : %i and size:%i\n", sizeof(array5)/sizeof(array5[0]), sizeof(array5));
-    // printf("Array 6 length : %i and size:%i\n", sizeof(array6)/sizeof(array6[0]), sizeof(array6));
-    // printf("Array 7 length : %i and size:%i\n", sizeof(array7)/sizeof(array7[0]), sizeof(array7));
-    // printf("Array 8 length : %i and size:%i\n", sizeof(array8)/sizeof(array8[0]), sizeof(array8));
-    // printf("Array 9 length : %i and size:%i\n", sizeof(array9)/sizeof(array9[0]), sizeof(array9));
-    // printf("Array 10 length : %i and size:%i\n", sizeof(array10)/sizeof(array10[0]), sizeof(array10));
-    // printf("Array 11 length : %i and size:%i\n", sizeof(array11)/sizeof(array11[0]), sizeof(array11));
-    // printf("Array 12 length : %i and size:%i\n", sizeof(array12)/sizeof(array12[0]), sizeof(array12));
-    // printf("Array 13 length : %i and size:%i\n", sizeof(array13)/sizeof(array13[0]), sizeof(array13));
-    // printf("Array 14 length : %i and size:%i\n", sizeof(array14)/sizeof(array14[0]), sizeof(array14));
-    // printf("Array 15 length : %i and size:%i\n", sizeof(array15)/sizeof(array15[0]), sizeof(array15));
     // printf("Array 16 length : %i and size:%i and size of array16[0]: %i\n", sizeof(array16)/sizeof(array16[0]), sizeof(array16), sizeof(array16[0]));
     printf("CHANNEL: %d - VOLTAGE: %f\n\n", CHANNEL, voltage);
     old_time = millis();
