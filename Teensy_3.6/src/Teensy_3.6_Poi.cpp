@@ -22,6 +22,8 @@
 #include <teensy_3.6_config.h>
 #include "..\..\Teensy_4.0\src\visual_functions.h"
 #include "..\..\Teensy_4.0\src\visual_functions.cpp"
+#include "..\..\Teensy_4.0\src\pacifica_visual.h"
+#include "..\..\Teensy_4.0\src\pacifica_visual.cpp"
 
 //#include "send_voltage.h"
 

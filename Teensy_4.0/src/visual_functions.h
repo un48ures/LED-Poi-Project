@@ -26,6 +26,8 @@ void juggle(message msg, CRGB *leds);
 void bpm(message msg, CRGB *leds);
 void sinelon(message msg, CRGB *leds);
 void confetti(message msg, CRGB *leds);
+void pride(CRGB *leds);
+void Fire2012(CRGB* leds);
 void dim_up(message msg, CRGB* leds);
 void dim_down(message msg, CRGB* leds);
 void LED_Pulsing(int hue, int message_brightness, int velocity, CRGB* leds);

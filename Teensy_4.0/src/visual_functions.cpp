@@ -4,6 +4,7 @@
 #include "FastLED.h"
 #include "pic_array.h"
 #include <RF24.h>
+#include "pacifica_visual.h"
 
 int hue = 0;
 
@@ -110,6 +111,29 @@ void display(message msg, CRGB *leds)
     break;
   case 14: // RUN DOWN
     LED_runner(msg, true, leds);
+    break;
+  case 15: // PRIDE (FastLED Example)
+    EVERY_N_MILLISECONDS(msg.velocity) 
+    {
+      pride(leds);
+      FastLED.setBrightness(msg.value_brightness);
+      FastLED.show();
+    }
+    break;
+  case 16: // PRIDE (FastLED Example)
+    EVERY_N_MILLISECONDS(msg.velocity) 
+    {
+      pacifica_loop(leds);
+      FastLED.setBrightness(msg.value_brightness);
+      FastLED.show();
+    }
+  case 17: // FIRE (FastLED Example)
+    EVERY_N_MILLISECONDS(msg.velocity) 
+    {
+      Fire2012(leds);
+      FastLED.setBrightness(msg.value_brightness);
+      FastLED.show();
+    }
     break;
 
   default:
@@ -418,6 +442,92 @@ void juggle(message msg, CRGB *leds) {
   FastLED.show();
 }
 
+// COOLING: How much does the air cool as it rises?
+// Less cooling = taller flames.  More cooling = shorter flames.
+// Default 50, suggested range 20-100 
+#define COOLING  55
+
+// SPARKING: What chance (out of 255) is there that a new spark will be lit?
+// Higher chance = more roaring fire.  Lower chance = more flickery fire.
+// Default 120, suggested range 50-200.
+#define SPARKING 120
+bool gReverseDirection = false;
+
+void Fire2012(CRGB* leds)
+{
+// Array of temperature readings at each simulation cell
+  static byte heat[NUM_LEDS];
+
+  // Step 1.  Cool down every cell a little
+    for( int i = 0; i < NUM_LEDS; i++) {
+      heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
+    }
+  
+    // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+    for( int k= NUM_LEDS - 1; k >= 2; k--) {
+      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
+    }
+    
+    // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
+    if( random8() < SPARKING ) {
+      int y = random8(7);
+      heat[y] = qadd8( heat[y], random8(160,255) );
+    }
+
+    // Step 4.  Map from heat cells to LED colors
+    for( int j = 0; j < NUM_LEDS; j++) {
+      CRGB color = HeatColor( heat[j]);
+      int pixelnumber;
+      if( gReverseDirection ) {
+        pixelnumber = (NUM_LEDS-1) - j;
+      } else {
+        pixelnumber = j;
+      }
+      leds[pixelnumber] = color;
+    }
+}
+
+void pride(CRGB *leds) 
+{
+  static uint16_t sPseudotime = 0;
+  static uint16_t sLastMillis = 0;
+  static uint16_t sHue16 = 0;
+ 
+  uint8_t sat8 = beatsin88( 87, 220, 250);
+  uint8_t brightdepth = beatsin88( 341, 96, 224);
+  uint16_t brightnessthetainc16 = beatsin88( 203, (25 * 256), (40 * 256));
+  uint8_t msmultiplier = beatsin88(147, 23, 60);
+
+  uint16_t hue16 = sHue16;//gHue * 256;
+  uint16_t hueinc16 = beatsin88(113, 1, 3000);
+  
+  uint16_t ms = millis();
+  uint16_t deltams = ms - sLastMillis ;
+  sLastMillis  = ms;
+  sPseudotime += deltams * msmultiplier;
+  sHue16 += deltams * beatsin88( 400, 5,9);
+  uint16_t brightnesstheta16 = sPseudotime;
+  
+  for( uint16_t i = 0 ; i < NUM_LEDS; i++) {
+    hue16 += hueinc16;
+    uint8_t hue8 = hue16 / 256;
+
+    brightnesstheta16  += brightnessthetainc16;
+    uint16_t b16 = sin16( brightnesstheta16  ) + 32768;
+
+    uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
+    uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
+    bri8 += (255 - brightdepth);
+    
+    CRGB newcolor = CHSV( hue8, sat8, bri8);
+    
+    uint16_t pixelnumber = i;
+    pixelnumber = (NUM_LEDS-1) - pixelnumber;
+    
+    nblend( leds[pixelnumber], newcolor, 64);
+  }
+}
+
 void dim_down(message msg, CRGB *leds)
 {
   if(picture_changed)
@@ -475,6 +585,11 @@ void LED_runner(message msg, bool reverse, CRGB *leds)
 {
   fill_solid(leds, NUM_LEDS, CRGB::Black);
   LED_fillup(msg, reverse, leds);
+  if(fillupDone)
+  {
+    fill_solid(leds, NUM_LEDS, CRGB::Black);
+    FastLED.show();
+  }
 }
 
 void show_color(message msg, CRGB *leds)

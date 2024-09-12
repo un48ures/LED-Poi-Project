@@ -22,6 +22,7 @@
 #include "pic_array.h"
 #include "teensy_4.0_config.h"
 #include "visual_functions.h"
+#include "pacifica_visual.h"
 
 #define PIC_IS_SHOWN 25
 
