@@ -127,6 +127,7 @@ void display(message msg, CRGB *leds)
       FastLED.setBrightness(msg.value_brightness);
       FastLED.show();
     }
+    break;
   case 17: // FIRE (FastLED Example)
     EVERY_N_MILLISECONDS(msg.velocity) 
     {
