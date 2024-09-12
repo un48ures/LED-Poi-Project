@@ -34,6 +34,7 @@ bool fillupDone = false;
 bool dim_up_done = false;
 bool picture_changed = false;
 unsigned long starttime = 0;
+int pics_start_nr = 20; // the first poi array (picture) shows at msg.picture = 20
 
 const unsigned int *pic_array[31] = {array1, array2, array3, array4, array5, array6, array7, array8, array9, array10, array11, array12, array13, array14, 
                                     array15, array16, array17, array18, array19, array20, array21, array22, array23, array24, array25, array26, array27, array28, 
@@ -57,9 +58,9 @@ void display(message msg, CRGB *leds)
     dim_up_done = false;
   }
 
-  if ((msg.picture >= 15) && (((unsigned int)msg.picture - 14) <= (sizeof(pic_array_length) / sizeof(int))))
+  if ((msg.picture >= pics_start_nr) && (((unsigned int)msg.picture - pics_start_nr + 1) <= (sizeof(pic_array_length) / sizeof(int))))
   {
-    showPicOnce(pic_array[msg.picture - 15], pic_array_length[msg.picture - 15], msg, leds);
+    showPicOnce(pic_array[msg.picture - pics_start_nr], pic_array_length[msg.picture - pics_start_nr], msg, leds);
   }
 
   switch (msg.picture)
@@ -321,7 +322,7 @@ void LED_fillup(message msg, bool reverse, CRGB *leds)
   {
     RGBColour c = hsv2rgb(msg.hue / 255.0 * 360.0, 100, 100); // transform 255 to 360° hue, ignore saturation and brightness
 
-    if ((i <= NUM_LEDS) && (millis() >= (starttime + msg.velocity)))
+    if ((i < NUM_LEDS) && (millis() >= (starttime + msg.velocity)))
     {
       if(!reverse)
       {
