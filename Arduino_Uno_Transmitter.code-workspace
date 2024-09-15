@@ -8,6 +8,14 @@
 		},
 		{
 			"path": "Teensy_4.0"
+		},
+		{
+			"name": "Teensy 4.0 SD Card Reader",
+			"path": "Teensy 4.0 SD Card Reader"
+		},
+		{
+			"name": "Teensy_Mass_Storage",
+			"path": "Teensy_Mass_Storage"
 		}
 	],
 	"settings": {
@@ -17,7 +25,9 @@
 			"unordered_map": "cpp",
 			"vector": "cpp",
 			"system_error": "cpp",
-			"rf24.h": "c"
+			"rf24.h": "c",
+			"*.bak": "c",
+			"fstream": "cpp"
 		}
 	}
 }
