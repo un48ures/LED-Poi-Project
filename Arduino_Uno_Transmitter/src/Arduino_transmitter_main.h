@@ -8,6 +8,8 @@
 // Radio configuration settings
 const byte pipe_address[6] = "00001";         // Pipe address
 const byte CHs[NUM_RECEIVERS] = {10, 20, 30, 40, 50, 60}; // Channels of pois 1-6
+const int retries_global = 15;
+const int delay_retries_global = 2;
 
 // HW Pins
 enum HW_PINS

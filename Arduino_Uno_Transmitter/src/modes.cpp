@@ -66,9 +66,9 @@ void video_light_mode_HW(RF24* radio, receiver* teensy)
       for (uint8_t i = 0; i < NUM_RECEIVERS; i++)
       {
         data[1] = 0; // Black
-        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
+        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, retries_global, delay_retries_global);
         data[1] = 99; // Blink red 1st LED Pixel
-        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
+        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, retries_global, delay_retries_global);
       }
       break;
 
@@ -77,7 +77,7 @@ void video_light_mode_HW(RF24* radio, receiver* teensy)
       {
         data[1] = program;
         data[3] = brightness;
-        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, 1, 1);
+        send_data(&teensy[i], data, (uint8_t) sizeof(data), pipe_address, radio, retries_global, delay_retries_global);
       }
       break;
     }
@@ -103,7 +103,7 @@ void pass_on_message(RF24* radio, receiver* teensy, message message_from_pc)
   || message_from_pc.value_brightness != old_message.value_brightness
   || message_from_pc.velocity != old_message.velocity)
   {
-    send_data(&teensy[message_from_pc.receiver_id - 1], data, (uint8_t) sizeof(data), pipe_address, radio, 5, 2);
+    send_data(&teensy[message_from_pc.receiver_id - 1], data, (uint8_t) sizeof(data), pipe_address, radio, retries_global, delay_retries_global);
     send_receiver_info_to_serial(teensy);
     old_message = message_from_pc;
   }
@@ -184,56 +184,55 @@ int send_data(receiver* teensy, byte *data, uint8_t size, const uint8_t *pipe_ad
 void signal_strength(RF24 *radio, receiver *teensy, int8_t total)
 {
     const uint16_t num_test_bytes = 20;
-    const uint16_t repititions = 100;
-    const uint16_t time_wait = 3000; // Wait time till the next test
+    const uint16_t repititions = 50;
+    const uint16_t time_wait = 1000; // Wait time till the next test
     static unsigned long old_time = 0;
 
     if (millis() > (old_time + time_wait))
     {
-        //radio->setRetries(0, 0); // No retries allowed
-        for (int j = 0; j < total; j++)
+      // radio->setRetries(0, 0); // No retries allowed
+      for (int j = 0; j < total; j++)
+      {
+        byte buffer[num_test_bytes] = {0};
+        int counter = 0;
+        unsigned long startTime, endTime;
+        int signalStrength = 0;
+        uint8_t status = 0;
+        startTime = millis();
+        for (uint8_t i = 0; i < repititions; i++)
         {
-            byte buffer[num_test_bytes] = {0};
-            int counter = 0;
-            unsigned long startTime, endTime;
-            float speed = 0.0;
-            int signalStrength = 0;
-            uint8_t status = 0;
-            startTime = millis();
-            for (uint8_t i = 0; i < repititions; i++)
-            {
-                //status = radio->write(buffer, sizeof(buffer)); // send x bytes of data. It does not matter what it is
-                status = send_data(&teensy[j], buffer, sizeof(buffer), pipe_address, radio, 0, 0);
-                if (status)
-                {
-                  counter++;
-                }
-            }
-            endTime = millis();
-            speed = (float) counter * num_test_bytes / (endTime - startTime);
-            signalStrength = (float)counter / repititions * 100.0;
-            teensy[j].signalStrength = signalStrength;
-            // Serial.print("Channel:");
-            // Serial.print(CHs[j]);
-            // Serial.print("\t");
-            // Serial.print("Signal strength: ");
-            // Serial.print(signalStrength);
-            // Serial.print(" %\t Speed: ");
-            // Serial.print(speed);
-            // Serial.print(" kB/s");
-            // Serial.print("\t Duration: ");
-            // Serial.print(endTime - startTime);
-            // Serial.print(" ms ");
-            // Serial.print("\t Data: ");
-            // Serial.print((float)counter * num_test_bytes / 1000.0);
-            // Serial.print(" kB");
-            // Serial.print("\t Voltage: ");
-            // Serial.print(teensy[j].voltage);
-            // Serial.println(" V");
+          // status = radio->write(buffer, sizeof(buffer)); // send x bytes of data. It does not matter what it is
+          status = send_data(&teensy[j], buffer, sizeof(buffer), pipe_address, radio, 0, 0);
+          if (status)
+          {
+            counter++;
+          }
         }
-        // Serial.println(" ");
-        old_time = millis();
-        send_receiver_info_to_serial(teensy);
+        endTime = millis();
+        float speed = (float)counter * num_test_bytes / (endTime - startTime);
+        signalStrength = (float)counter / repititions * 100.0;
+        teensy[j].signalStrength = signalStrength;
+        // Serial.print("Channel:");
+        // Serial.print(CHs[j]);
+        // Serial.print("\t");
+        // Serial.print("Signal strength: ");
+        // Serial.print(signalStrength);
+        // Serial.print(" %\t Speed: ");
+        // Serial.print(speed);
+        // Serial.print(" kB/s");
+        // Serial.print("\t Duration: ");
+        // Serial.print(endTime - startTime);
+        // Serial.print(" ms ");
+        // Serial.print("\t Data: ");
+        // Serial.print((float)counter * num_test_bytes / 1000.0);
+        // Serial.print(" kB");
+        // Serial.print("\t Voltage: ");
+        // Serial.print(teensy[j].voltage);
+        // Serial.println(" V");
+      }
+      // Serial.println(" ");
+      old_time = millis();
+      send_receiver_info_to_serial(teensy);
     }
 }
 
