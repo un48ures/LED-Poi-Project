@@ -1,0 +1,136 @@
+#include <SPI.h>
+#include <SD.h>
+
+// const int chipSelect = BUILTIN_SDCARD; // Teensy has its own SD card interface
+const int chipSelect = 10;
+
+void listFiles(File dir, int numTabs);
+bool readFile(File dir);
+void setSPIFullSpeed();
+char buffer [50000] = {};
+
+void setup()
+{
+  Serial.begin(9600);
+  while (!Serial)
+  {
+    ; // Wait for serial port to connect (Teensy 4.0 specific)
+  }
+
+  Serial.println("Initializing SD card...");
+
+  // if (!SD.begin(chipSelect, SPI_HALF_SPEED))
+  if (!SD.begin(chipSelect))
+  {
+    Serial.println("SD card initialization failed!");
+    return;
+  }
+
+  Serial.println("SD card initialized.");
+
+  // Switch to full speed for reading the file
+  setSPIFullSpeed();
+
+  listFiles(SD.open("/"), 0);
+  File root = SD.open("/");
+  readFile(root);
+}
+
+void listFiles(File dir, int numTabs)
+{
+  while (true)
+  {
+    File entry = dir.openNextFile();
+    if (!entry)
+    {
+      // No more files
+      break;
+    }
+
+    for (int i = 0; i < numTabs; i++)
+    {
+      Serial.print('\t');
+    }
+
+    Serial.print(entry.name());
+    if (entry.isDirectory())
+    {
+      Serial.println("/");
+      listFiles(entry, numTabs + 1);
+    }
+    else
+    {
+      // Files have sizes, directories don't
+      Serial.print("\t\t");
+      Serial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
+}
+
+bool readFile(File dir)
+{
+  while (true)
+  {
+    File entry = dir.openNextFile();
+    if (!entry)
+    {
+      // No more files
+      return false;
+    }
+
+    if (entry.isDirectory())
+    {
+      entry.close();
+      continue; // Skip directories
+    }
+    else
+    {
+      // Open the first file we find and read its contents
+      Serial.print("Reading file: ");
+      Serial.println(entry.name());
+      Serial.print("Size: ");
+      Serial.println(entry.size());
+
+      int numValues = 0;
+      uint16_t arraySize = entry.size(); // Reset the number of values
+      // arraySize = 33000;
+      char values[numValues] = {};
+
+      unsigned int starttime = millis();
+      // while (entry.available() && numValues < arraySize)
+      // {
+      //   // int value = entry.parseInt(); // Assuming the file contains integer values
+      //   // char value = entry.read();
+      //   values[numValues++] = entry.read();  // Store the value in the array
+      //   // Serial.print(value);
+      //   // Serial.print(" ");
+      // }
+      Serial.print("arraySize = ");
+      Serial.println(arraySize);
+      Serial.println("Before read");
+      long bytesRead = entry.read(buffer, arraySize);  // Read up to 100 bytes
+      Serial.println("After read");
+      // if (bytesRead < arraySize) {
+      //   buffer[bytesRead] = '\0';  // Null-terminate the buffer if fewer than 100 bytes are read
+      // }
+      Serial.print("Bytes read: ");
+      Serial.println(bytesRead);
+      Serial.print("Time to read: ");
+      Serial.println(millis() - starttime);
+
+      entry.close();
+      return true; // Successfully read the first file
+    }
+  }
+}
+
+void setSPIFullSpeed() {
+  // Manually configure SPI for full speed (maximum)
+  SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));  // 4MHz for full speed
+}
+
+void loop()
+{
+  // Nothing to do here
+}
