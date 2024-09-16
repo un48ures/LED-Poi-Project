@@ -42,15 +42,18 @@ message msg;
 
 void setup()
 {
+
   Serial.begin(115200);                     //Serial
   printf("Initializing...");    
-  SPI.setSCK(RF24_SCK);                     //SPI
+  SPI.setSCK(RF24_SCK);                     //SPI for radio
+  SPI.setMISO(RF24_MISO);
+  SPI.setMOSI(RF24_MOSI);
   SPI.begin();
   delay(200);                               //LED
   FastLED.addLeds<APA102,(uint8_t) DATA_PIN,(uint8_t) CLOCK_PIN, (EOrder) COLOR_ORDER, (uint32_t) DATA_RATE_MHZ(10)>(leds, (int) NUM_LEDS);
   FastLED.clear();
   FastLED.setBrightness(DEFAULT_BRIGHTNESS);
-  radio.begin();                            //radio
+  radio.begin(&SPI);                            //radio
   radio.openReadingPipe(0, pipe_address);
   radio.setPALevel(RF24_PA_HIGH);
   radio.setDataRate(RF24_1MBPS);
