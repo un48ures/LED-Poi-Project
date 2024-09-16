@@ -4,18 +4,16 @@
 			"path": "Arduino_Uno_Transmitter"
 		},
 		{
-			"path": "Teensy_3.6"
+			"path": "Teensy_4.0_Receiver"
 		},
 		{
-			"path": "Teensy_4.0"
+			"path": "Teensy_3.6_Receiver"
 		},
 		{
-			"name": "Teensy 4.0 SD Card Reader",
-			"path": "Teensy 4.0 SD Card Reader"
+			"path": "Teensy 4.0_SD_Card_Reader_test"
 		},
 		{
-			"name": "Teensy_Mass_Storage",
-			"path": "Teensy_Mass_Storage"
+			"path": "Teensy_4.0_Mass_Storage_test"
 		}
 	],
 	"settings": {
